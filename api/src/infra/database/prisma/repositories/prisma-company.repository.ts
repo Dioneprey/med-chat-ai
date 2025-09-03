@@ -5,7 +5,7 @@ import { Company } from '@generated/index';
 import {
   CompanyRepository,
   CompanyRepositoryFindByUniqueFieldProps,
-} from 'src/domain/qa/application/repositories/company.repository';
+} from 'src/domain/chat/application/repositories/company.repository';
 
 @Injectable()
 export class PrismaCompanyRepository implements CompanyRepository {

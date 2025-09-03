@@ -11,7 +11,7 @@ import {
   SendEmailScheduleProcessor,
 } from './processor/send-email-schedule.processor';
 import { BullMQSendEmailScheduleService } from './service/bullmq-send-email-schedule.service';
-import { SendEmailSchedule } from 'src/domain/qa/application/schedules/send-email.schedule';
+import { SendEmailSchedule } from 'src/domain/chat/application/schedules/send-email.schedule';
 import { MailModule } from 'src/infra/mail/mail.module';
 
 @Module({

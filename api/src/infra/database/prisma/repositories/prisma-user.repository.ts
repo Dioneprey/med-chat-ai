@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   UserRepository,
   UserRepositoryFindByUniqueFieldProps,
-} from 'src/domain/qa/application/repositories/user.repository';
+} from 'src/domain/chat/application/repositories/user.repository';
 import { PrismaService } from '../prisma.service';
 import { User } from '@generated/index';
 

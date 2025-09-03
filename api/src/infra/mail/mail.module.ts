@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { EnvService } from '../env/env.service';
 import { NodeMailerSendEmailService } from './nodemailer/nodemailer-send-email.service';
 import { EnvModule } from '../env/env.module';
-import { SendEmail } from 'src/domain/qa/application/mail/send-email';
+import { SendEmail } from 'src/domain/chat/application/mail/send-email';
 
 @Module({
   imports: [

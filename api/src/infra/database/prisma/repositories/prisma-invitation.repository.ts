@@ -5,7 +5,7 @@ import { Invitation } from '@generated/index';
 import {
   InvitationRepository,
   InvitationRepositoryFindByUniqueFieldProps,
-} from 'src/domain/qa/application/repositories/invitation.repository';
+} from 'src/domain/chat/application/repositories/invitation.repository';
 
 @Injectable()
 export class PrismaInvitationRepository implements InvitationRepository {

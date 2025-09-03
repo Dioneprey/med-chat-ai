@@ -4,7 +4,7 @@ import { Job } from 'bullmq';
 import {
   SendEmail,
   SendEmailParams,
-} from 'src/domain/qa/application/mail/send-email';
+} from 'src/domain/chat/application/mail/send-email';
 
 export const SEND_EMAIL_SCHEDULE_PROCESSOR = 'send-email-schedule-processor';
 

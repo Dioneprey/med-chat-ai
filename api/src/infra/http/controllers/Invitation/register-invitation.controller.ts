@@ -11,10 +11,10 @@ import {
 
 import { z } from 'zod';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
-import { WrongCredentialsError } from 'src/domain/qa/application/use-cases/@errors/wrong-credentials';
-import { ResourceAlreadyExists } from 'src/domain/qa/application/use-cases/@errors/resource-already-exists.error';
-import { ResourceNotFoundError } from 'src/domain/qa/application/use-cases/@errors/resource-not-found.error';
-import { RegisterInvitationUseCase } from 'src/domain/qa/application/use-cases/invitation/register-invitation';
+import { WrongCredentialsError } from 'src/domain/chat/application/use-cases/@errors/wrong-credentials';
+import { ResourceAlreadyExists } from 'src/domain/chat/application/use-cases/@errors/resource-already-exists.error';
+import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
+import { RegisterInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/register-invitation';
 import { CurrentUser } from 'src/infra/auth/decorators/current-user.decorator';
 import { UserPayload } from 'src/core/types/user-payload';
 import { Roles } from 'src/infra/auth/decorators/role.decorator';

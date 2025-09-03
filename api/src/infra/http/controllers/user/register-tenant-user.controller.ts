@@ -14,10 +14,10 @@ import { z } from 'zod';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
 import { Public } from 'src/infra/auth/public';
 import { FastifyReply } from 'fastify';
-import { WrongCredentialsError } from 'src/domain/qa/application/use-cases/@errors/wrong-credentials';
-import { ResourceAlreadyExists } from 'src/domain/qa/application/use-cases/@errors/resource-already-exists.error';
-import { ResourceNotFoundError } from 'src/domain/qa/application/use-cases/@errors/resource-not-found.error';
-import { RegisterTenantUserUseCase } from 'src/domain/qa/application/use-cases/user/register-tenant-user';
+import { WrongCredentialsError } from 'src/domain/chat/application/use-cases/@errors/wrong-credentials';
+import { ResourceAlreadyExists } from 'src/domain/chat/application/use-cases/@errors/resource-already-exists.error';
+import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
+import { RegisterTenantUserUseCase } from 'src/domain/chat/application/use-cases/user/register-tenant-user';
 
 const RegisterTenantBodySchema = z.object({
   email: z.string(),

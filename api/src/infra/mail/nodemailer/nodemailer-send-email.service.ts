@@ -4,7 +4,7 @@ import { render } from '@react-email/render';
 import {
   SendEmail,
   SendEmailParams,
-} from 'src/domain/qa/application/mail/send-email';
+} from 'src/domain/chat/application/mail/send-email';
 import { EmailTemplate } from 'src/core/types/email-template';
 import InvitationEmail from '../templates/invitation';
 import { EnvService } from 'src/infra/env/env.service';

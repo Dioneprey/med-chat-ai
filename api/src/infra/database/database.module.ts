@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
-import { UserRepository } from 'src/domain/qa/application/repositories/user.repository';
+import { UserRepository } from 'src/domain/chat/application/repositories/user.repository';
 import { PrismaUserRepository } from './prisma/repositories/prisma-user.repository';
-import { CompanyRepository } from 'src/domain/qa/application/repositories/company.repository';
+import { CompanyRepository } from 'src/domain/chat/application/repositories/company.repository';
 import { PrismaCompanyRepository } from './prisma/repositories/prisma-company.repository';
-import { InvitationRepository } from 'src/domain/qa/application/repositories/invitation.repository';
+import { InvitationRepository } from 'src/domain/chat/application/repositories/invitation.repository';
 import { PrismaInvitationRepository } from './prisma/repositories/prisma-invitation.repository';
 
 @Module({

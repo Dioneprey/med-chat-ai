@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { Encrypter } from 'src/domain/qa/application/cryptography/encrypter';
+import { Encrypter } from 'src/domain/chat/application/cryptography/encrypter';
 import { JwtEncrypter } from './jwt-encrypter';
 import { EnvModule } from 'src/infra/env/env.module';
-import { HashComparer } from 'src/domain/qa/application/cryptography/hash-comparer';
+import { HashComparer } from 'src/domain/chat/application/cryptography/hash-comparer';
 import { BcryptHasher } from './bcrypt.hasher';
-import { HashGenerator } from 'src/domain/qa/application/cryptography/hash-generator';
+import { HashGenerator } from 'src/domain/chat/application/cryptography/hash-generator';
 
 @Module({
   imports: [EnvModule],

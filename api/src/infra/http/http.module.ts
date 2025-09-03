@@ -5,20 +5,20 @@ import { DatabaseModule } from '../database/database.module';
 import { CryptographyModule } from '../cryptography/cryptography.module';
 import { BullMqConfigModule } from '../schedules/bullmq/bullmq.module';
 import { AuthenticateController } from './controllers/auth/authenticate';
-import { AuthenticateUseCase } from 'src/domain/qa/application/use-cases/auth/authenticate';
+import { AuthenticateUseCase } from 'src/domain/chat/application/use-cases/auth/authenticate';
 import { MailModule } from '../mail/mail.module';
 import { EnvModule } from '../env/env.module';
 import { GetMeController } from './controllers/user/me.controller';
 import { RegisterTenantController } from './controllers/user/register-tenant-user.controller';
 import { RegisterUserController } from './controllers/user/register-user.controller';
-import { RegisterTenantUserUseCase } from 'src/domain/qa/application/use-cases/user/register-tenant-user';
-import { RegisterUserUseCase } from 'src/domain/qa/application/use-cases/user/register-user';
+import { RegisterTenantUserUseCase } from 'src/domain/chat/application/use-cases/user/register-tenant-user';
+import { RegisterUserUseCase } from 'src/domain/chat/application/use-cases/user/register-user';
 import { GetCompanyByNameController } from './controllers/company/get-company-by-name.controller';
-import { GetCompanyByNameUseCase } from 'src/domain/qa/application/use-cases/company/get-company-by-name';
+import { GetCompanyByNameUseCase } from 'src/domain/chat/application/use-cases/company/get-company-by-name';
 import { RegisterInvitationController } from './controllers/Invitation/register-invitation.controller';
-import { RegisterInvitationUseCase } from 'src/domain/qa/application/use-cases/invitation/register-invitation';
+import { RegisterInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/register-invitation';
 import { RevokeInvitationController } from './controllers/Invitation/revoke-invitation.controller';
-import { RevokeInvitationUseCase } from 'src/domain/qa/application/use-cases/invitation/revoke-invitation';
+import { RevokeInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/revoke-invitation';
 
 @Module({
   imports: [

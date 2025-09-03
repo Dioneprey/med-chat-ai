@@ -12,12 +12,12 @@ import {
 
 import { z } from 'zod';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
-import { WrongCredentialsError } from 'src/domain/qa/application/use-cases/@errors/wrong-credentials';
-import { ResourceAlreadyExists } from 'src/domain/qa/application/use-cases/@errors/resource-already-exists.error';
-import { ResourceNotFoundError } from 'src/domain/qa/application/use-cases/@errors/resource-not-found.error';
+import { WrongCredentialsError } from 'src/domain/chat/application/use-cases/@errors/wrong-credentials';
+import { ResourceAlreadyExists } from 'src/domain/chat/application/use-cases/@errors/resource-already-exists.error';
+import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
 import { CurrentUser } from 'src/infra/auth/decorators/current-user.decorator';
 import { UserPayload } from 'src/core/types/user-payload';
-import { RevokeInvitationUseCase } from 'src/domain/qa/application/use-cases/invitation/revoke-invitation';
+import { RevokeInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/revoke-invitation';
 import { Roles } from 'src/infra/auth/decorators/role.decorator';
 
 const RevokeInvitationBodySchema = z.object({

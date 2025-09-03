@@ -11,9 +11,9 @@ import {
 import { z } from 'zod';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
 import { Public } from 'src/infra/auth/public';
-import { AuthenticateUseCase } from 'src/domain/qa/application/use-cases/auth/authenticate';
+import { AuthenticateUseCase } from 'src/domain/chat/application/use-cases/auth/authenticate';
 import { FastifyReply } from 'fastify';
-import { WrongCredentialsError } from 'src/domain/qa/application/use-cases/@errors/wrong-credentials';
+import { WrongCredentialsError } from 'src/domain/chat/application/use-cases/@errors/wrong-credentials';
 
 const AuthenticateBodySchema = z.object({
   email: z.string(),

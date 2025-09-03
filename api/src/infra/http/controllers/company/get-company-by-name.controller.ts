@@ -10,8 +10,8 @@ import {
 import { z } from 'zod';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
 import { Public } from 'src/infra/auth/public';
-import { ResourceNotFoundError } from 'src/domain/qa/application/use-cases/@errors/resource-not-found.error';
-import { GetCompanyByNameUseCase } from 'src/domain/qa/application/use-cases/company/get-company-by-name';
+import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
+import { GetCompanyByNameUseCase } from 'src/domain/chat/application/use-cases/company/get-company-by-name';
 
 const GetCompanyByNameQuerySchema = z.object({
   name: z.string(),
