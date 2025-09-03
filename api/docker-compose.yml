@@ -1,0 +1,46 @@
+services:
+  database:
+    container_name: medseniorqa_database
+    env_file:
+      - .env
+    image: 'postgres:15'
+    ports:
+      - '5455:5432'
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks:
+      - medseniorqa-network
+
+  pgadmin:
+    container_name: medseniorqa_pgadmin
+    image: dpage/pgadmin4:6.10
+    ports:
+      - 8080:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=medseniorqa@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=123456
+    networks:
+      - medseniorqa-network
+
+  redis:
+    image: redis:8.2.1
+    env_file:
+      - .env
+    container_name: medseniorqa_redis_server
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./redis:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - medseniorqa-network
+
+networks:
+  medseniorqa-network:
+    driver: bridge

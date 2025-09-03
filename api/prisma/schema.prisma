@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma_client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MessageType {
+  USER
+  AI
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users       User[]
+  chats       Chat[]
+  invitations Invitation[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  companyId String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+  chats   Chat[]
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+  user     User      @relation(fields: [userId], references: [id])
+  company  Company   @relation(fields: [companyId], references: [id])
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  chatId    String
+  type      MessageType
+  content   String      @db.Text
+  createdAt DateTime    @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id])
+}
+
+model Invitation {
+  id           String   @id @default(cuid())
+  companyId    String
+  invitedEmail String
+  code         String   @unique
+  used         Boolean  @default(false)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+}
