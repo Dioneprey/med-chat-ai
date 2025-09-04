@@ -12,6 +12,7 @@ export const envSchema = z.object({
   COOKIE_SECRET: z.string(),
   JWT_SECRET: z.string(),
   JWT_EXPIRATION: z.string().default('15'),
+  JAEGER_URL: z.string().default('http://localhost:4318/v1/traces'),
   FRONT_END_URL: z.string().default('FRONT_END_URL'),
   REDIS_HOST: z.string().optional().default('localhost'),
   REDIS_PORT: z.coerce.number().optional().default(6379),
