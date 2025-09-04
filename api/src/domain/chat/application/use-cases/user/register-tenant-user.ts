@@ -1,12 +1,11 @@
 import { Either, left, right } from 'src/core/either';
 import { Injectable } from '@nestjs/common';
 import { Encrypter } from '../../cryptography/encrypter';
-import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
 import { UserRepository } from '../../repositories/user.repository';
-import { ResourceInvalidError } from '../@errors/resource-invalid.error';
 import { ResourceAlreadyExists } from '../@errors/resource-already-exists.error';
 import { HashGenerator } from '../../cryptography/hash-generator';
 import { CompanyRepository } from '../../repositories/company.repository';
+import { CodeRepository } from '../../repositories/code.repository';
 
 interface RegisterTenantUserUseCaseRequest {
   name: string;
@@ -16,9 +15,10 @@ interface RegisterTenantUserUseCaseRequest {
 }
 
 type RegisterTenantUserUseCaseResponse = Either<
-  ResourceNotFoundError | ResourceInvalidError | ResourceAlreadyExists,
+  ResourceAlreadyExists,
   {
     accessToken: string;
+    refreshToken: string;
   }
 >;
 
@@ -27,6 +27,7 @@ export class RegisterTenantUserUseCase {
   constructor(
     private userRepository: UserRepository,
     private companyRepository: CompanyRepository,
+    private codeRepository: CodeRepository,
     private encrypter: Encrypter,
     private hashGenerator: HashGenerator,
   ) {}
@@ -79,6 +80,20 @@ export class RegisterTenantUserUseCase {
       companyId: user.companyId,
     });
 
-    return right({ accessToken });
+    const refreshToken = await this.encrypter.encrypt({
+      sub: user.id,
+    });
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.codeRepository.create({
+      userId: user.id,
+      value: refreshToken,
+      type: 'REFRESH_TOKEN',
+      expiresAt: expiresAt,
+    });
+
+    return right({ accessToken, refreshToken });
   }
 }

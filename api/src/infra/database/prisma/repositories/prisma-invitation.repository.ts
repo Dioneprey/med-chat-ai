@@ -41,10 +41,10 @@ export class PrismaInvitationRepository implements InvitationRepository {
     });
   }
 
-  async delete(invitationId: string): Promise<void> {
+  async delete(invitation: Invitation): Promise<void> {
     await this.prisma.invitation.delete({
       where: {
-        id: invitationId,
+        id: invitation.id,
       },
     });
   }

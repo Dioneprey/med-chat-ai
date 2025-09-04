@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../public';
 import { Reflector } from '@nestjs/core';
@@ -31,7 +35,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return canActivate;
     } catch {
       // Se a rota for pública e o token for inválido, ignora o erro e permite a requisição
-      return isPublic;
+      if (isPublic) {
+        return true; // ignora erro em rota pública
+      }
+      throw new UnauthorizedException('Missing or invalid token');
     }
   }
 }

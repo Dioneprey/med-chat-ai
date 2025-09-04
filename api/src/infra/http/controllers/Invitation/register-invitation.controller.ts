@@ -18,6 +18,7 @@ import { RegisterInvitationUseCase } from 'src/domain/chat/application/use-cases
 import { CurrentUser } from 'src/infra/auth/decorators/current-user.decorator';
 import { UserPayload } from 'src/core/types/user-payload';
 import { Roles } from 'src/infra/auth/decorators/role.decorator';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 const RegisterInvitationBodySchema = z.object({
   email: z.string(),
@@ -28,6 +29,7 @@ type RegisterInvitationBodySchema = z.infer<
 >;
 const bodyValidationPipe = new ZodValidationPipe(RegisterInvitationBodySchema);
 
+@ApiTags('invitation')
 @Controller('/invitation')
 export class RegisterInvitationController {
   constructor(private registerInvitation: RegisterInvitationUseCase) {}
@@ -35,6 +37,41 @@ export class RegisterInvitationController {
   @Post()
   @HttpCode(201)
   @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Register an invitation',
+    description: 'Permite que um admin convide um usuário para a plataforma',
+  })
+  @ApiBody({
+    description: 'Email do usuário a ser convidado',
+    schema: {
+      example: { email: 'user@example.com' },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Convite registrado com sucesso',
+    schema: { example: { message: 'Invitation sent successfully' } },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - usuário sem permissão',
+    schema: { example: { message: 'Forbidden' } },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Recurso não encontrado',
+    schema: { example: { message: 'Resource not found' } },
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Email já foi convidado',
+    schema: { example: { message: 'Resource already exists' } },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Erro de requisição',
+    schema: { example: { message: 'Bad request' } },
+  })
   async handle(
     @Body(bodyValidationPipe) body: RegisterInvitationBodySchema,
     @CurrentUser() user: UserPayload,
@@ -50,14 +87,18 @@ export class RegisterInvitationController {
       const error = result.value;
       switch (error.constructor) {
         case WrongCredentialsError:
-          return new ForbiddenException(error);
+          return new ForbiddenException(error.message);
         case ResourceAlreadyExists:
-          return new ConflictException(error);
+          return new ConflictException(error.message);
         case ResourceNotFoundError:
-          return new NotFoundException(error);
+          return new NotFoundException(error.message);
         default:
           return new BadRequestException(error.message);
       }
     }
+
+    return {
+      message: 'Invitation sent successfully',
+    };
   }
 }

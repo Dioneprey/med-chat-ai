@@ -1,10 +1,10 @@
 import { Either, left, right } from 'src/core/either';
 import { Injectable } from '@nestjs/common';
 import { Encrypter } from '../../cryptography/encrypter';
-import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
 import { UserRepository } from '../../repositories/user.repository';
 import { HashComparer } from '../../cryptography/hash-comparer';
 import { WrongCredentialsError } from '../@errors/wrong-credentials';
+import { CodeRepository } from '../../repositories/code.repository';
 
 interface AuthenticateUseCaseRequest {
   email: string;
@@ -12,9 +12,10 @@ interface AuthenticateUseCaseRequest {
 }
 
 type AuthenticateUseCaseResponse = Either<
-  WrongCredentialsError | ResourceNotFoundError,
+  WrongCredentialsError,
   {
     accessToken: string;
+    refreshToken: string;
   }
 >;
 
@@ -24,6 +25,7 @@ export class AuthenticateUseCase {
     private userRepository: UserRepository,
     private encrypter: Encrypter,
     private hashComparer: HashComparer,
+    private codeRepository: CodeRepository,
   ) {}
 
   async execute({
@@ -36,7 +38,7 @@ export class AuthenticateUseCase {
     });
 
     if (!userExists) {
-      return left(new ResourceNotFoundError(`User with email: ${email}`));
+      return left(new WrongCredentialsError());
     }
 
     const isPasswordValid = await this.hashComparer.compare(
@@ -54,6 +56,25 @@ export class AuthenticateUseCase {
       companyId: userExists.companyId,
     });
 
-    return right({ accessToken });
+    const refreshToken = await this.encrypter.encrypt({
+      sub: userExists.id,
+    });
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.codeRepository.deleteByUserId({
+      userId: userExists.id,
+      type: 'REFRESH_TOKEN',
+    });
+
+    await this.codeRepository.create({
+      userId: userExists.id,
+      value: refreshToken,
+      type: 'REFRESH_TOKEN',
+      expiresAt: expiresAt,
+    });
+
+    return right({ accessToken, refreshToken });
   }
 }

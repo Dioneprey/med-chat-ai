@@ -18,9 +18,9 @@ export abstract class InvitationRepository {
   }: InvitationRepositoryFindByUniqueFieldProps): Promise<Invitation | null>;
 
   abstract create(
-    Invitation: Optional<Invitation, 'id' | 'createdAt' | 'updatedAt' | 'used'>,
+    invitation: Optional<Invitation, 'id' | 'createdAt' | 'updatedAt' | 'used'>,
   ): Promise<Invitation>;
 
-  abstract save(Invitation: Partial<Invitation>): Promise<Invitation>;
-  abstract delete(InvitationId: string): Promise<void>;
+  abstract save(invitation: Partial<Invitation>): Promise<Invitation>;
+  abstract delete(invitation: Partial<Invitation>): Promise<void>;
 }

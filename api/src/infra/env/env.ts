@@ -11,7 +11,7 @@ export const envSchema = z.object({
   DATABASE_NAME: z.string().default('medseniorqa'),
   COOKIE_SECRET: z.string(),
   JWT_SECRET: z.string(),
-  JWT_EXPIRATION: z.string().default('15m'),
+  JWT_EXPIRATION: z.string().default('15'),
   FRONT_END_URL: z.string().default('FRONT_END_URL'),
   REDIS_HOST: z.string().optional().default('localhost'),
   REDIS_PORT: z.coerce.number().optional().default(6379),
@@ -24,8 +24,8 @@ export const envSchema = z.object({
   MAIL_USER_EMAIL: z.string(),
   MAIL_PASSWORD: z.string(),
   MAIL_IGNORE_TLS: z.string().transform((value) => value === 'true'),
-  GOOGLE_CLIENT_ID: z.string(),
-  GOOGLE_CLIENT_SECRET: z.string(),
+  OPENAI_API_KEY: z.string(),
+  SENTRY_DSN: z.string(),
   CONTACT_EMAIL: z.string().default('contato@medseniorqa.com'),
 });
 

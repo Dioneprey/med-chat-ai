@@ -7,6 +7,7 @@ import { InvitationRepository } from '../../repositories/invitation.repository';
 import { ResourceInvalidError } from '../@errors/resource-invalid.error';
 import { ResourceAlreadyExists } from '../@errors/resource-already-exists.error';
 import { HashGenerator } from '../../cryptography/hash-generator';
+import { CodeRepository } from '../../repositories/code.repository';
 
 interface RegisterUserUseCaseRequest {
   name: string;
@@ -27,6 +28,7 @@ export class RegisterUserUseCase {
   constructor(
     private userRepository: UserRepository,
     private invitationRepository: InvitationRepository,
+    private codeRepository: CodeRepository,
     private encrypter: Encrypter,
     private hashGenerator: HashGenerator,
   ) {}
@@ -79,7 +81,7 @@ export class RegisterUserUseCase {
         role: 'USER',
         password: hashedPassword,
       }),
-      this.invitationRepository.delete(invitationExists.id),
+      this.invitationRepository.delete(invitationExists),
     ]);
 
     const accessToken = await this.encrypter.encrypt({
@@ -88,6 +90,20 @@ export class RegisterUserUseCase {
       companyId: user.companyId,
     });
 
-    return right({ accessToken });
+    const refreshToken = await this.encrypter.encrypt({
+      sub: user.id,
+    });
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.codeRepository.create({
+      userId: user.id,
+      value: refreshToken,
+      type: 'REFRESH_TOKEN',
+      expiresAt: expiresAt,
+    });
+
+    return right({ accessToken, refreshToken });
   }
 }

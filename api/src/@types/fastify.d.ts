@@ -2,6 +2,11 @@ import '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 declare module 'fastify' {
+  interface FastifyRequest {
+    cookies: {
+      [cookieName: string]: string;
+    };
+  }
   interface FastifyReply {
     cookies: {
       [cookieName: string]: string;

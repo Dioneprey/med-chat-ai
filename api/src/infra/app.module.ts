@@ -6,9 +6,10 @@ import { HttpModule } from './http/http.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { EnvModule } from './env/env.module';
-
+import { SentryModule } from '@sentry/nestjs/setup';
 @Module({
   imports: [
+    SentryModule.forRoot(),
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {

@@ -1,8 +1,9 @@
 import { Company } from '@generated/index';
 import { Optional } from '@generated/runtime/library';
 
+export type CompanyKey = 'name' | 'id';
 export interface CompanyRepositoryFindByUniqueFieldProps {
-  key: 'name' | 'id';
+  key: CompanyKey;
   value: string;
 }
 
@@ -24,5 +25,5 @@ export abstract class CompanyRepository {
     >,
   ): Promise<Company>;
   abstract save(company: Partial<Company>): Promise<Company>;
-  abstract delete(companyId: string): Promise<void>;
+  abstract delete(company: Partial<Company>): Promise<void>;
 }

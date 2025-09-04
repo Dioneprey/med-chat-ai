@@ -55,7 +55,7 @@ export class RevokeInvitationUseCase {
         new ResourceNotFoundError(`An invitation for ${invitedEmail}`),
       );
     }
-    await this.invitationRepository.delete(invitationExists.id);
+    await this.invitationRepository.delete(invitationExists);
 
     return right(undefined);
   }

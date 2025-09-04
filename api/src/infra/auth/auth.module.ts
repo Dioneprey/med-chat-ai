@@ -16,7 +16,7 @@ import { RolesGuard } from './guards/role.guard';
       useFactory: (envService: EnvService) => ({
         secret: envService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: envService.get('JWT_EXPIRATION'),
+          expiresIn: `${envService.get('JWT_EXPIRATION')}m`,
         },
       }),
     }),

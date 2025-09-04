@@ -28,34 +28,12 @@ const InvitationEmail = ({
     <Preview>Convite para se juntar à {companyName}!</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Img src={`${baseUrl}/logo.svg`} width={120} height={120} alt="Logo" />
-        <Heading style={heading}>Link de acesso</Heading>
+        <Heading style={heading}>Código de acesso</Heading>
 
         <Section style={body}>
           <Text style={paragraph}>
             Olá! Você foi convidado a se juntar à empresa {companyName} no
-            MedChatIA.
-          </Text>
-
-          <Text style={paragraph}>
-            Clique no botão abaixo para criar sua conta.
-          </Text>
-          <Link
-            href={`${baseUrl}/user/signup?code=${invitationCode}`}
-            style={button}
-          >
-            Criar conta
-          </Link>
-
-          <Text style={paragraph}>
-            Se o botão não abrir, clique aqui para acessar sua conta.
-            <Link
-              href={`${baseUrl}/user/signup?code=${invitationCode}`}
-              style={{
-                cursor: 'pointer',
-              }}
-            ></Link>
-            .
+            MedChatAI.
           </Text>
 
           <Text style={paragraph}>
@@ -76,7 +54,7 @@ const InvitationEmail = ({
         </Section>
 
         <Hr style={hr} />
-        <Text style={footer}>MedChatIA</Text>
+        <Text style={footer}>MedChatAI</Text>
       </Container>
     </Body>
   </Html>

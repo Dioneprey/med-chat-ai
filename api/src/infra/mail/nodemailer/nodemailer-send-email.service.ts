@@ -49,7 +49,7 @@ export class NodeMailerSendEmailService implements SendEmail {
 
     await this.mailerService.sendMail({
       to: recipientEmail,
-      subject: subject ?? 'MedChatIA',
+      subject: subject ?? 'MedChatAI',
       html: `${html}`,
     });
   }

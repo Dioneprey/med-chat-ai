@@ -3,49 +3,73 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Company } from '@generated/index';
 import {
+  CompanyKey,
   CompanyRepository,
   CompanyRepositoryFindByUniqueFieldProps,
 } from 'src/domain/chat/application/repositories/company.repository';
+import { RedisRepository } from '../../redis/redis.service';
 
 @Injectable()
 export class PrismaCompanyRepository implements CompanyRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private redisRepository: RedisRepository,
+  ) {}
   async findByUniqueField({
     key,
     value,
   }: CompanyRepositoryFindByUniqueFieldProps) {
-    if (!value) return null;
+    const cacheKey = `company:${key}:${value}`;
+    const cached = await this.redisRepository.get<Company>(cacheKey);
 
-    return await this.prisma.company.findFirst({
+    if (cached) return cached;
+
+    const company = await this.prisma.company.findFirst({
       where: {
         [key]: value,
       },
     });
+
+    await this.redisRepository.set(cacheKey, company, 180);
+
+    return company;
   }
 
   async create(company: Company) {
-    return await this.prisma.company.create({
+    const createdCompany = await this.prisma.company.create({
       data: {
         ...company,
         createdAt: new Date(),
       },
     });
+
+    return createdCompany;
   }
 
   async save(company: Company) {
-    return await this.prisma.company.update({
+    const editedCompany = await this.prisma.company.update({
       where: {
         id: company.id,
       },
       data: company,
     });
+
+    for (const key of Object.keys(company) as CompanyKey[]) {
+      await this.redisRepository.del(`company:${key}:${company[key]}`);
+    }
+
+    return editedCompany;
   }
 
-  async delete(companyId: string): Promise<void> {
+  async delete(company: Company): Promise<void> {
     await this.prisma.company.delete({
       where: {
-        id: companyId,
+        id: company.id,
       },
     });
+
+    for (const key of Object.keys(company) as CompanyKey[]) {
+      await this.redisRepository.del(`company:${key}:${company[key]}`);
+    }
   }
 }

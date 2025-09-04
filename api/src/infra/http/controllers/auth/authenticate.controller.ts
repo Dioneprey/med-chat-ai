@@ -14,6 +14,8 @@ import { Public } from 'src/infra/auth/public';
 import { AuthenticateUseCase } from 'src/domain/chat/application/use-cases/auth/authenticate';
 import { FastifyReply } from 'fastify';
 import { WrongCredentialsError } from 'src/domain/chat/application/use-cases/@errors/wrong-credentials';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { EnvService } from 'src/infra/env/env.service';
 
 const AuthenticateBodySchema = z.object({
   email: z.string(),
@@ -23,20 +25,58 @@ const AuthenticateBodySchema = z.object({
 type AuthenticateBodySchema = z.infer<typeof AuthenticateBodySchema>;
 const bodyValidationPipe = new ZodValidationPipe(AuthenticateBodySchema);
 
-@Controller('/authenticate')
+@ApiTags('auth')
+@Controller('/auth')
 @Public()
 export class AuthenticateController {
-  constructor(private Authenticate: AuthenticateUseCase) {}
+  constructor(
+    private authenticate: AuthenticateUseCase,
+    private envService: EnvService,
+  ) {}
 
   @Post()
   @HttpCode(200)
+  @ApiOperation({
+    summary: 'Authenticate user',
+    description: 'Autentica um usuário e retorna um token JWT no cookie',
+  })
+  @ApiBody({
+    description: 'Credenciais do usuário',
+    schema: {
+      example: {
+        email: 'user@example.com',
+        password: 'senha123',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful',
+    schema: {
+      example: { message: 'Login successful' },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Wrong credentials',
+    schema: {
+      example: { message: 'Credenciais incorretas' },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request',
+    schema: {
+      example: { message: 'Erro de requisição' },
+    },
+  })
   async handle(
     @Body(bodyValidationPipe) body: AuthenticateBodySchema,
     @Res({ passthrough: true }) reply: FastifyReply,
   ) {
     const { email, password } = body;
 
-    const result = await this.Authenticate.execute({
+    const result = await this.authenticate.execute({
       email,
       password,
     });
@@ -45,16 +85,23 @@ export class AuthenticateController {
       const error = result.value;
       switch (error.constructor) {
         case WrongCredentialsError:
-          return new ForbiddenException(error);
+          return new ForbiddenException(error.message);
         default:
           return new BadRequestException(error.message);
       }
     }
 
-    const accessToken = result.value.accessToken;
+    const { accessToken, refreshToken } = result.value;
 
     reply
       .setCookie('Authentication', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        sameSite: 'lax',
+        maxAge: Number(this.envService.get('JWT_EXPIRATION')) * 60, // 15 minutos
+      })
+      .setCookie('RefreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         path: '/',

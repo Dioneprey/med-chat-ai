@@ -4,7 +4,7 @@ import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { CryptographyModule } from '../cryptography/cryptography.module';
 import { BullMqConfigModule } from '../schedules/bullmq/bullmq.module';
-import { AuthenticateController } from './controllers/auth/authenticate';
+import { AuthenticateController } from './controllers/auth/authenticate.controller';
 import { AuthenticateUseCase } from 'src/domain/chat/application/use-cases/auth/authenticate';
 import { MailModule } from '../mail/mail.module';
 import { EnvModule } from '../env/env.module';
@@ -19,6 +19,17 @@ import { RegisterInvitationController } from './controllers/Invitation/register-
 import { RegisterInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/register-invitation';
 import { RevokeInvitationController } from './controllers/Invitation/revoke-invitation.controller';
 import { RevokeInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/revoke-invitation';
+import { ConversationModule } from '../conversation/conversation.module';
+import { SendChatMessageController } from './controllers/chat/send-chat-message.controller';
+import { SendChatMessageUseCase } from 'src/domain/chat/application/use-cases/chat/send-chat-message';
+import { FetchChatMessageUseCase } from 'src/domain/chat/application/use-cases/chat/fetch-chat-messages';
+import { FetchChatMessageController } from './controllers/chat/fetch-chat-message.controller';
+import { FetchAllChatsController } from './controllers/chat/fetch-all-chats.controller';
+import { FetchAllChatsUseCaseUseCase } from 'src/domain/chat/application/use-cases/chat/fetch-all-chats';
+import { RefreshTokenController } from './controllers/auth/refresh-token.controller';
+import { RefreshTokenUseCase } from 'src/domain/chat/application/use-cases/auth/refresh-token';
+import { GetAdminDashboardStatsController } from './controllers/dashboard/get-admin-dashboard-stats.controller';
+import { GetAdminDashboardStatsUseCase } from 'src/domain/chat/application/use-cases/dashboard/get-admin-dashboard-stats';
 
 @Module({
   imports: [
@@ -28,6 +39,7 @@ import { RevokeInvitationUseCase } from 'src/domain/chat/application/use-cases/i
     BullMqConfigModule,
     MailModule,
     EnvModule,
+    ConversationModule,
   ],
   controllers: [
     HealthController,
@@ -35,28 +47,51 @@ import { RevokeInvitationUseCase } from 'src/domain/chat/application/use-cases/i
     // Company
     GetCompanyByNameController,
 
+    // Auth
+
+    AuthenticateController,
+    RefreshTokenController,
+
     // User
     GetMeController,
-    AuthenticateController,
     RegisterTenantController,
     RegisterUserController,
 
     // Invitation
     RegisterInvitationController,
     RevokeInvitationController,
+
+    // Chat
+    SendChatMessageController,
+    FetchChatMessageController,
+    FetchAllChatsController,
+
+    // Dashboard
+    GetAdminDashboardStatsController,
   ],
   providers: [
     // Company
     GetCompanyByNameUseCase,
 
-    // User
+    // Auth
     AuthenticateUseCase,
+    RefreshTokenUseCase,
+
+    // User
     RegisterTenantUserUseCase,
     RegisterUserUseCase,
 
     // Invitation
     RegisterInvitationUseCase,
     RevokeInvitationUseCase,
+
+    // Chat
+    SendChatMessageUseCase,
+    FetchChatMessageUseCase,
+    FetchAllChatsUseCaseUseCase,
+
+    // Dashboard
+    GetAdminDashboardStatsUseCase,
   ],
   exports: [],
 })

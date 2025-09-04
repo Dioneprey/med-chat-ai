@@ -9,6 +9,9 @@ import { EnvService } from './env/env.service';
 import { Logger } from 'nestjs-pino';
 import * as fastifyCookie from '@fastify/cookie';
 import { Env } from './env/env';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AllExceptionsFilter } from './http/filter/exceptions.filter';
+import * as Sentry from '@sentry/nestjs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -26,13 +29,27 @@ async function bootstrap() {
 
   const port = envService.get('PORT');
   const cookieSecret = envService.get('COOKIE_SECRET');
+  const sentryDsn = envService.get('SENTRY_DSN');
+  const nodeEnv = envService.get('NODE_ENV');
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.setGlobalPrefix('api');
+
+  const config = new DocumentBuilder()
+    .setTitle('med-chat-ai-api')
+    .setDescription('API docs')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.register(fastifyCookie, {
     secret: cookieSecret,
     parseOptions: {},
   });
-
-  app.setGlobalPrefix('api');
 
   app.enableCors({
     origin: ['*'],
@@ -41,8 +58,15 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: nodeEnv,
+    tracesSampleRate: 1.0,
+    sendDefaultPii: true,
+  });
+
   await app.listen(port, '0.0.0.0').then(() => {
-    console.log(`[MedChatIA - API] HTTP server running on port: ${port}!`);
+    console.log(`[MedChatAI - API] HTTP server running on port: ${port}!`);
   });
 }
 
