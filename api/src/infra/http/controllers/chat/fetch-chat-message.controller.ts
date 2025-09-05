@@ -23,6 +23,7 @@ import { UserPayload } from 'src/core/types/user-payload';
 import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
 import { FetchChatMessageUseCase } from 'src/domain/chat/application/use-cases/chat/fetch-chat-messages';
 import { MessagesLimitError } from 'src/domain/chat/application/use-cases/@errors/messages-limit.error';
+import { MessagePresenter } from '../../presenters/message-presenter';
 
 const fetchChatMessageParamSchema = z.object({
   chatId: z.string(),
@@ -138,7 +139,7 @@ export class FetchChatMessageController {
 
     return {
       chatId,
-      messages,
+      messages: messages.map(MessagePresenter.toHTTP),
       meta: {
         pageIndex: pageIndex ?? 0,
         pageSize,

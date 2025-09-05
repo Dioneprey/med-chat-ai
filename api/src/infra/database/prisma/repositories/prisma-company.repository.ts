@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
-import { Company } from '@generated/index';
+import { Company as PrismaCompany } from '@generated/index';
 import {
-  CompanyKey,
   CompanyRepository,
   CompanyRepositoryFindByUniqueFieldProps,
 } from 'src/domain/chat/application/repositories/company.repository';
 import { RedisRepository } from '../../redis/redis.service';
+import { PrismaCompanyMapper } from '../mappers/prisma-company-mapper';
+import { Company, CompanyKey } from 'src/domain/chat/entities/company';
 
 @Injectable()
 export class PrismaCompanyRepository implements CompanyRepository {
@@ -20,56 +21,63 @@ export class PrismaCompanyRepository implements CompanyRepository {
     value,
   }: CompanyRepositoryFindByUniqueFieldProps) {
     const cacheKey = `company:${key}:${value}`;
-    const cached = await this.redisRepository.get<Company>(cacheKey);
+    const cached = await this.redisRepository.get<PrismaCompany>(cacheKey);
 
-    if (cached) return cached;
+    if (cached) return PrismaCompanyMapper.toDomain(cached);
 
-    const company = await this.prisma.company.findFirst({
+    const prismaCompany = await this.prisma.company.findFirst({
       where: {
         [key]: value,
       },
     });
 
-    await this.redisRepository.set(cacheKey, company, 180);
+    if (!prismaCompany) {
+      return null;
+    }
 
-    return company;
+    await this.redisRepository.set(cacheKey, prismaCompany, 180);
+
+    return PrismaCompanyMapper.toDomain(prismaCompany);
   }
 
   async create(company: Company) {
+    const data = PrismaCompanyMapper.toPrisma(company);
+
     const createdCompany = await this.prisma.company.create({
-      data: {
-        ...company,
-        createdAt: new Date(),
-      },
+      data: data,
     });
 
-    return createdCompany;
+    return PrismaCompanyMapper.toDomain(createdCompany);
   }
 
   async save(company: Company) {
+    const data = PrismaCompanyMapper.toPrisma(company);
+
     const editedCompany = await this.prisma.company.update({
       where: {
-        id: company.id,
+        id: data.id,
       },
-      data: company,
+      data: data,
     });
 
-    for (const key of Object.keys(company) as CompanyKey[]) {
-      await this.redisRepository.del(`company:${key}:${company[key]}`);
+    for (const key of Object.keys(data) as CompanyKey[]) {
+      await this.redisRepository.del(`company:${key}:${data[key]}`);
     }
 
-    return editedCompany;
+    return PrismaCompanyMapper.toDomain(editedCompany);
   }
 
   async delete(company: Company): Promise<void> {
+    const data = PrismaCompanyMapper.toPrisma(company);
+
     await this.prisma.company.delete({
       where: {
-        id: company.id,
+        id: data.id,
       },
     });
 
-    for (const key of Object.keys(company) as CompanyKey[]) {
-      await this.redisRepository.del(`company:${key}:${company[key]}`);
+    for (const key of Object.keys(data) as CompanyKey[]) {
+      await this.redisRepository.del(`company:${key}:${data[key]}`);
     }
   }
 }

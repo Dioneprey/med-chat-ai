@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ChatRepository } from '../../repositories/chat.repository';
 import { Either, left, right } from 'src/core/either';
 import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
+import { Message } from 'src/domain/chat/entities/message';
+import { ChatPresenter } from 'src/infra/http/presenters/chat-presenter';
 
 export interface FetchChatMessageUseCaseRequest {
   chatId: string;
@@ -17,12 +19,7 @@ type FetchChatMessageUseCaseResponse = Either<
     chatId: string;
     totalCount: number;
     totalPages: number;
-    messages: {
-      id: string;
-      content: string;
-      type: 'USER' | 'AI';
-      createdAt: Date;
-    }[];
+    messages: Message[];
   }
 >;
 
@@ -58,16 +55,9 @@ export class FetchChatMessageUseCase {
       pageSize,
     });
 
-    const messages = chatMessages.map((m) => ({
-      id: m.id,
-      content: m.content,
-      type: m.type,
-      createdAt: m.createdAt,
-    }));
-
     return right({
-      chatId: chat.id,
-      messages,
+      chatId: chat.id.toString(),
+      messages: chatMessages,
       totalCount,
       totalPages,
     });

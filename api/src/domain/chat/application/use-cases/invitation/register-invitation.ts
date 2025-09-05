@@ -9,6 +9,7 @@ import { ForbiddenError } from '../@errors/forbidden.error';
 import { generateCode } from 'src/core/helpers/generate-code';
 import { EmailTemplate } from 'src/core/types/email-template';
 import { SendEmailSchedule } from '../../schedules/send-email.schedule';
+import { Invitation } from 'src/domain/chat/entities/invitation';
 
 interface RegisterInvitationUseCaseRequest {
   userId: string;
@@ -70,12 +71,14 @@ export class RegisterInvitationUseCase {
 
     const invitationCode = generateCode(6);
 
-    await this.invitationRepository.create({
+    const invitation = Invitation.create({
       companyId: userExists.companyId,
       invitedEmail,
       code: invitationCode,
       expiresAt,
     });
+
+    await this.invitationRepository.create(invitation);
 
     const companyName = userExists!.company!.name;
 

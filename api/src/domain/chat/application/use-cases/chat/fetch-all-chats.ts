@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChatRepository } from '../../repositories/chat.repository';
 import { Either, right } from 'src/core/either';
-import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
-import { Chat } from '@generated/index';
+import { Chat } from 'src/domain/chat/entities/chat';
 
 export interface FetchAllChatsUseCaseUseCaseRequest {
   userId: string;

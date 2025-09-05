@@ -1,5 +1,6 @@
-import { Chat, Message, MessageType } from '@generated/index';
 import { PaginationProps, PaginationResponse } from 'src/core/types/pagination';
+import { Message, MessageType } from '../../entities/message';
+import { Chat } from '../../entities/chat';
 
 export interface QuestionsByDay {
   day: string;
@@ -51,29 +52,20 @@ export interface ChatRepositoryGetMessagesProps extends PaginationProps<{}> {
   chatId: string;
   companyId: string;
 }
-
-interface PrismaChatInclude extends Chat {
-  messages?: Message[];
-}
-
 export abstract class ChatRepository {
-  abstract create(userId: string, companyId: string): Promise<Chat>;
+  abstract create(chat: Chat): Promise<Chat>;
 
   abstract getChatById({
     chatId,
     include,
-  }: ChatRepositoryGetChatByIdProps): Promise<PrismaChatInclude | null>;
+  }: ChatRepositoryGetChatByIdProps): Promise<Chat | null>;
 
   abstract getChats({
     pageIndex,
     filters,
   }: ChatRepositoryGetChatsProps): Promise<PaginationResponse<Chat>>;
 
-  abstract addMessage(
-    chatId: string,
-    type: MessageType,
-    content: string,
-  ): Promise<Message>;
+  abstract addMessage(message: Message): Promise<Message>;
   abstract countMessages(chatId: string): Promise<number>;
 
   abstract getMessages({

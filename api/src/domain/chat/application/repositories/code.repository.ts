@@ -1,5 +1,4 @@
-import { Code, CodeType } from '@generated/index';
-import { Optional } from '@generated/runtime/library';
+import { Code, CodeType } from '../../entities/code';
 
 export interface CodeRepositoryFindByUniqueFieldProps {
   key: 'value' | 'id';
@@ -17,10 +16,8 @@ export abstract class CodeRepository {
     value,
   }: CodeRepositoryFindByUniqueFieldProps): Promise<Code | null>;
 
-  abstract create(
-    code: Optional<Code, 'id' | 'createdAt' | 'updatedAt'>,
-  ): Promise<Code>;
-  abstract save(code: Partial<Code>): Promise<Code>;
+  abstract create(code: Code): Promise<Code>;
+  abstract save(code: Code): Promise<Code>;
   abstract deleteByUserId({
     userId,
     type,

@@ -12,8 +12,12 @@ import {
 } from 'src/domain/chat/application/repositories/chat.repository';
 import { PrismaService } from '../prisma.service';
 import { RedisRepository } from '../../redis/redis.service';
-import { Chat, Message } from '@generated/index';
+import { Chat as PrismaChat, Message as PrismaMessage } from '@generated/index';
 import { PaginationResponse } from 'src/core/types/pagination';
+import { Chat } from 'src/domain/chat/entities/chat';
+import { PrismaChatMapper } from '../mappers/prisma-chat-mapper';
+import { Message } from 'src/domain/chat/entities/message';
+import { PrismaMessageMapper } from '../mappers/prisma-message-mapper';
 
 @Injectable()
 export class PrismaChatRepository implements ChatRepository {
@@ -22,24 +26,26 @@ export class PrismaChatRepository implements ChatRepository {
     private redisRepository: RedisRepository,
   ) {}
 
-  async create(userId: string, companyId: string) {
-    const chat = await this.prisma.chat.create({
-      data: {
-        userId,
-        companyId,
-        createdAt: new Date(),
-      },
+  async create(chat: Chat) {
+    const data = PrismaChatMapper.toPrisma(chat);
+
+    const createdChat = await this.prisma.chat.create({
+      data: data,
     });
 
     await Promise.all([
-      this.redisRepository.del(`user:${userId}:chats`),
+      this.redisRepository.del(`user:${data.userId}:chats`),
 
-      this.redisRepository.purgeByPrefix(`company:${companyId}:messagesCount`),
-      this.redisRepository.purgeByPrefix(`company:${companyId}:topUsers`),
-      this.redisRepository.purgeByPrefix(`company:${companyId}:questionsByDay`),
+      this.redisRepository.purgeByPrefix(
+        `company:${data.companyId}:messagesCount`,
+      ),
+      this.redisRepository.purgeByPrefix(`company:${data.companyId}:topUsers`),
+      this.redisRepository.purgeByPrefix(
+        `company:${data.companyId}:questionsByDay`,
+      ),
     ]);
 
-    return chat;
+    return PrismaChatMapper.toDomain(createdChat);
   }
 
   async getChatById({
@@ -49,18 +55,22 @@ export class PrismaChatRepository implements ChatRepository {
     include,
   }: ChatRepositoryGetChatByIdProps) {
     const cacheKey = `chat:${chatId}`;
-    const cached = await this.redisRepository.get<Chat>(cacheKey);
+    const cached = await this.redisRepository.get<PrismaChat>(cacheKey);
 
-    if (cached) return cached;
+    if (cached) return PrismaChatMapper.toDomain(cached);
 
-    const chat = await this.prisma.chat.findUnique({
+    const prismaChat = await this.prisma.chat.findUnique({
       where: { id: chatId, companyId, userId },
       include: { messages: include?.messages },
     });
 
-    await this.redisRepository.set(cacheKey, chat, 180); // TTL 180s
+    if (!prismaChat) {
+      return null;
+    }
 
-    return chat;
+    await this.redisRepository.set(cacheKey, prismaChat, 180); // TTL 180s
+
+    return PrismaChatMapper.toDomain(prismaChat);
   }
 
   async getChats({
@@ -71,11 +81,15 @@ export class PrismaChatRepository implements ChatRepository {
   }: ChatRepositoryGetChatsProps) {
     const cacheKey = `user:${userId}:chats`;
     const cached =
-      await this.redisRepository.get<PaginationResponse<Chat>>(cacheKey);
+      await this.redisRepository.get<PaginationResponse<PrismaChat>>(cacheKey);
 
-    if (cached) return cached;
+    if (cached)
+      return {
+        ...cached,
+        data: cached.data.map(PrismaChatMapper.toDomain),
+      };
 
-    const [chats, totalCount] = await Promise.all([
+    const [prismaChats, totalCount] = await Promise.all([
       this.prisma.chat.findMany({
         where: { companyId, userId },
         orderBy: { createdAt: 'asc' },
@@ -94,7 +108,7 @@ export class PrismaChatRepository implements ChatRepository {
     const totalPages = Math.ceil(totalCount / 10);
 
     const paginatedResponsed = {
-      data: chats,
+      data: prismaChats,
       pageIndex,
       totalCount,
       totalPages,
@@ -102,17 +116,17 @@ export class PrismaChatRepository implements ChatRepository {
 
     await this.redisRepository.set(cacheKey, paginatedResponsed, 180);
 
-    return paginatedResponsed;
+    return {
+      ...paginatedResponsed,
+      data: prismaChats.map(PrismaChatMapper.toDomain),
+    };
   }
 
-  async addMessage(chatId: string, type: 'USER' | 'AI', content: string) {
-    const message = await this.prisma.message.create({
-      data: {
-        chatId,
-        type,
-        content,
-        createdAt: new Date(),
-      },
+  async addMessage(message: Message) {
+    const data = PrismaMessageMapper.toPrisma(message);
+
+    const createdMessage = await this.prisma.message.create({
+      data: data,
       include: {
         chat: {
           select: {
@@ -124,22 +138,22 @@ export class PrismaChatRepository implements ChatRepository {
     });
 
     await Promise.all([
-      this.redisRepository.purgeByPrefix(`chat:${chatId}`),
+      this.redisRepository.purgeByPrefix(`chat:${data.chatId}`),
 
-      this.redisRepository.del(`user:${message.chat.userId}:chats`),
+      this.redisRepository.del(`user:${createdMessage.chat.userId}:chats`),
 
       this.redisRepository.purgeByPrefix(
-        `company:${message.chat.companyId}:messagesCount`,
+        `company:${createdMessage.chat.companyId}:messagesCount`,
       ),
       this.redisRepository.purgeByPrefix(
-        `company:${message.chat.companyId}:topUsers`,
+        `company:${createdMessage.chat.companyId}:topUsers`,
       ),
       this.redisRepository.purgeByPrefix(
-        `company:${message.chat.companyId}:questionsByDay`,
+        `company:${createdMessage.chat.companyId}:questionsByDay`,
       ),
     ]);
 
-    return message;
+    return PrismaMessageMapper.toDomain(createdMessage);
   }
 
   async countMessages(chatId: string) {
@@ -164,11 +178,17 @@ export class PrismaChatRepository implements ChatRepository {
   }: ChatRepositoryGetMessagesProps) {
     const cacheKey = `chat:${chatId}:messages:pageIndex:${pageIndex}:pageSize:${pageSize}`;
     const cached =
-      await this.redisRepository.get<PaginationResponse<Message>>(cacheKey);
+      await this.redisRepository.get<PaginationResponse<PrismaMessage>>(
+        cacheKey,
+      );
 
-    if (cached) return cached;
+    if (cached)
+      return {
+        ...cached,
+        data: cached.data.map(PrismaMessageMapper.toDomain),
+      };
 
-    const [messages, totalCount] = await Promise.all([
+    const [prismaMessages, totalCount] = await Promise.all([
       this.prisma.message.findMany({
         where: { chatId },
         orderBy: { createdAt: 'asc' },
@@ -187,7 +207,7 @@ export class PrismaChatRepository implements ChatRepository {
     const totalPages = Math.ceil(totalCount / 10);
 
     const paginatedResponsed = {
-      data: messages,
+      data: prismaMessages,
       pageIndex,
       totalCount,
       totalPages,
@@ -195,7 +215,10 @@ export class PrismaChatRepository implements ChatRepository {
 
     await this.redisRepository.set(cacheKey, paginatedResponsed, 180);
 
-    return paginatedResponsed;
+    return {
+      ...paginatedResponsed,
+      data: prismaMessages.map(PrismaMessageMapper.toDomain),
+    };
   }
 
   async getMessagesCount({
@@ -328,14 +351,14 @@ export class PrismaChatRepository implements ChatRepository {
     const cached = await this.redisRepository.get<Chat[]>(cacheKey);
     if (cached) return cached;
 
-    const chats = await this.prisma.chat.findMany({
+    const prismaChats = await this.prisma.chat.findMany({
       where: { userId, companyId },
       include: { messages: true },
       orderBy: { createdAt: 'desc' },
     });
 
-    await this.redisRepository.set(cacheKey, chats, 180); // TTL 180s
+    await this.redisRepository.set(cacheKey, prismaChats, 180); // TTL 180s
 
-    return chats;
+    return prismaChats.map(PrismaChatMapper.toDomain);
   }
 }

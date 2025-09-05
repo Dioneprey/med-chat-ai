@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Chat } from '@generated/index';
 import { ChatRepository } from '../../repositories/chat.repository';
 import { Either, left, right } from 'src/core/either';
 import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
 import { SendMessage } from '../../conversation/send-message';
 import { MessagesLimitError } from '../@errors/messages-limit.error';
+import { Chat } from 'src/domain/chat/entities/chat';
+import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
+import { Message, MessageType } from 'src/domain/chat/entities/message';
 
 export interface SendChatMessageUseCaseRequest {
   userId: string;
@@ -16,11 +18,7 @@ export interface SendChatMessageUseCaseRequest {
 type SendChatMessageUseCaseResponse = Either<
   ResourceNotFoundError | MessagesLimitError,
   {
-    chatId: string;
-    messageId: string;
-    content: string;
-    type: 'USER' | 'AI';
-    createdAt: Date;
+    message: Message;
   }
 >;
 
@@ -55,29 +53,34 @@ export class SendChatMessageUseCase {
         return left(new MessagesLimitError());
       }
     } else {
-      chat = await this.chatRepository.create(userId, companyId);
+      chat = Chat.create({
+        userId: new UniqueEntityID(userId),
+        companyId: new UniqueEntityID(companyId),
+      });
+
+      await this.chatRepository.create(chat);
     }
 
     const { data: history } = await this.chatRepository.getMessages({
-      chatId: chat.id,
+      chatId: chat.id.toString(),
       pageIndex: 1,
       companyId,
     });
 
-    const userMessage = await this.chatRepository.addMessage(
-      chat.id,
-      'USER',
-      message,
-    );
+    const userMessage = Message.create({
+      chatId: chat.id,
+      type: MessageType.USER,
+      content: message,
+    });
+
+    await this.chatRepository.addMessage(userMessage);
 
     // reaproveita o history que poderia estar em cache antes do "addMessage", mas adicionando a nova msg
     const updatedHistory = [
       ...history,
       {
-        id: userMessage.id,
         type: userMessage.type,
         content: userMessage.content,
-        createdAt: userMessage.createdAt,
       },
     ];
 
@@ -88,18 +91,16 @@ export class SendChatMessageUseCase {
       })),
     });
 
-    const aiMessage = await this.chatRepository.addMessage(
-      chat.id,
-      'AI',
-      aiMessageResponse,
-    );
+    const aiMessage = Message.create({
+      chatId: chat.id,
+      type: MessageType.AI,
+      content: aiMessageResponse,
+    });
+
+    await this.chatRepository.addMessage(aiMessage);
 
     return right({
-      chatId: chat.id,
-      messageId: aiMessage.id,
-      content: aiMessage.content,
-      type: aiMessage.type,
-      createdAt: aiMessage.createdAt,
+      message: aiMessage,
     });
   }
 }

@@ -5,6 +5,7 @@ import { UserRepository } from '../../repositories/user.repository';
 import { HashComparer } from '../../cryptography/hash-comparer';
 import { WrongCredentialsError } from '../@errors/wrong-credentials';
 import { CodeRepository } from '../../repositories/code.repository';
+import { Code, CodeType } from 'src/domain/chat/entities/code';
 
 interface AuthenticateUseCaseRequest {
   email: string;
@@ -23,9 +24,9 @@ type AuthenticateUseCaseResponse = Either<
 export class AuthenticateUseCase {
   constructor(
     private userRepository: UserRepository,
+    private codeRepository: CodeRepository,
     private encrypter: Encrypter,
     private hashComparer: HashComparer,
-    private codeRepository: CodeRepository,
   ) {}
 
   async execute({
@@ -51,9 +52,9 @@ export class AuthenticateUseCase {
     }
 
     const accessToken = await this.encrypter.encrypt({
-      sub: userExists.id,
+      sub: userExists.id.toString(),
       role: userExists.role,
-      companyId: userExists.companyId,
+      companyId: userExists.companyId.toString(),
     });
 
     const refreshToken = await this.encrypter.encrypt({
@@ -64,16 +65,18 @@ export class AuthenticateUseCase {
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     await this.codeRepository.deleteByUserId({
-      userId: userExists.id,
-      type: 'REFRESH_TOKEN',
+      userId: userExists.id.toString(),
+      type: CodeType.REFRESH_TOKEN,
     });
 
-    await this.codeRepository.create({
+    const code = Code.create({
       userId: userExists.id,
       value: refreshToken,
-      type: 'REFRESH_TOKEN',
+      type: CodeType.REFRESH_TOKEN,
       expiresAt: expiresAt,
     });
+
+    await this.codeRepository.create(code);
 
     return right({ accessToken, refreshToken });
   }

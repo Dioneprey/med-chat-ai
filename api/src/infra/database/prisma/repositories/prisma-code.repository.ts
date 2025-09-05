@@ -5,7 +5,8 @@ import {
   CodeRepositoryFindByUniqueFieldProps,
 } from 'src/domain/chat/application/repositories/code.repository';
 import { PrismaService } from '../prisma.service';
-import { Code } from '@generated/index';
+import { PrismaCodeMapper } from '../mappers/prisma-code-mapper';
+import { Code } from 'src/domain/chat/entities/code';
 
 @Injectable()
 export class PrismaCodeRepository implements CodeRepository {
@@ -14,31 +15,40 @@ export class PrismaCodeRepository implements CodeRepository {
     key,
     value,
   }: CodeRepositoryFindByUniqueFieldProps) {
-    if (!value) return null;
-
-    return await this.prisma.code.findFirst({
+    const prismaCode = await this.prisma.code.findFirst({
       where: {
         [key]: value,
       },
     });
+
+    if (!prismaCode) {
+      return null;
+    }
+
+    return PrismaCodeMapper.toDomain(prismaCode);
   }
 
   async create(code: Code) {
-    return await this.prisma.code.create({
-      data: {
-        ...code,
-        createdAt: new Date(),
-      },
+    const data = PrismaCodeMapper.toPrisma(code);
+
+    const createdCode = await this.prisma.code.create({
+      data: data,
     });
+
+    return PrismaCodeMapper.toDomain(createdCode);
   }
 
   async save(code: Code) {
-    return await this.prisma.code.update({
+    const data = PrismaCodeMapper.toPrisma(code);
+
+    const editedCode = await this.prisma.code.update({
       where: {
-        id: code.id,
+        id: data.id,
       },
-      data: code,
+      data: data,
     });
+
+    return PrismaCodeMapper.toDomain(editedCode);
   }
 
   async deleteByUserId({

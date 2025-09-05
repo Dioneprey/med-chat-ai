@@ -1,8 +1,7 @@
-import { Invitation } from '@generated/index';
-import { Optional } from '@generated/runtime/library';
+import { Invitation, InvitationKey } from '../../entities/invitation';
 
 export interface InvitationRepositoryFindByUniqueFieldProps {
-  key: 'code' | 'id' | 'invitedEmail';
+  key: InvitationKey;
   value: string;
   include?: {
     user?: boolean;
@@ -17,10 +16,8 @@ export abstract class InvitationRepository {
     include,
   }: InvitationRepositoryFindByUniqueFieldProps): Promise<Invitation | null>;
 
-  abstract create(
-    invitation: Optional<Invitation, 'id' | 'createdAt' | 'updatedAt' | 'used'>,
-  ): Promise<Invitation>;
+  abstract create(invitation: Invitation): Promise<Invitation>;
 
-  abstract save(invitation: Partial<Invitation>): Promise<Invitation>;
-  abstract delete(invitation: Partial<Invitation>): Promise<void>;
+  abstract save(invitation: Invitation): Promise<Invitation>;
+  abstract delete(invitation: Invitation): Promise<void>;
 }

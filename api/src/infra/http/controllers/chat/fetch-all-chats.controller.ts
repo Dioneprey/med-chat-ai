@@ -12,6 +12,7 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/infra/auth/decorators/current-user.decorator';
 import { UserPayload } from 'src/core/types/user-payload';
 import { FetchAllChatsUseCaseUseCase } from 'src/domain/chat/application/use-cases/chat/fetch-all-chats';
+import { ChatPresenter } from '../../presenters/chat-presenter';
 
 const fetchAllChatsQuerySchema = z.object({
   pageIndex: z.coerce.number().min(1).default(1),
@@ -83,7 +84,7 @@ export class FetchAllChatsController {
     const { chats, totalCount, totalPages } = result.value;
 
     return {
-      chats,
+      chats: chats.map(ChatPresenter.toHTTP),
       meta: {
         pageIndex: pageIndex ?? 0,
         pageSize,

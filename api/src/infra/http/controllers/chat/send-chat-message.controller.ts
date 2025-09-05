@@ -14,6 +14,7 @@ import { SendChatMessageUseCase } from 'src/domain/chat/application/use-cases/ch
 import { CurrentUser } from 'src/infra/auth/decorators/current-user.decorator';
 import { UserPayload } from 'src/core/types/user-payload';
 import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
+import { MessagePresenter } from '../../presenters/message-presenter';
 
 const sendChatMessageBodySchema = z.object({
   message: z.string(),
@@ -90,6 +91,10 @@ export class SendChatMessageController {
       }
     }
 
-    return result.value;
+    const { message: messageResponse } = result.value;
+
+    return {
+      message: MessagePresenter.toHTTP(messageResponse),
+    };
   }
 }

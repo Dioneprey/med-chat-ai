@@ -1,8 +1,8 @@
 import { Either, left, right } from 'src/core/either';
 import { Injectable } from '@nestjs/common';
 import { ResourceNotFoundError } from '../@errors/resource-not-found.error';
-import { Company } from '@generated/index';
 import { CompanyRepository } from '../../repositories/company.repository';
+import { Company } from 'src/domain/chat/entities/company';
 
 interface GetCompanyByNameUseCaseRequest {
   name: string;

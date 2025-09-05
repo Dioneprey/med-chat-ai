@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { EnvService } from './env/env.service';
 import { Logger } from 'nestjs-pino';
-import * as fastifyCookie from '@fastify/cookie';
+import fastifyCookie from '@fastify/cookie';
 import { Env } from './env/env';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './http/filter/exceptions.filter';

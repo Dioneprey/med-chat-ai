@@ -8,6 +8,7 @@ import {
   QuestionsByDay,
   TopUsersQuestions,
 } from '../../repositories/chat.repository';
+import { MessageType } from 'src/domain/chat/entities/message';
 
 interface GetAdminDashboardStatsUseCaseRequest {
   userId: string;
@@ -66,7 +67,7 @@ export class GetAdminDashboardStatsUseCase {
         companyId,
         from,
         to,
-        type: ['USER'],
+        type: [MessageType.USER],
       }),
       this.userRepository.count({ companyId, from, to }),
       this.userRepository.count({ companyId }),
@@ -80,7 +81,7 @@ export class GetAdminDashboardStatsUseCase {
         companyId,
         from,
         to,
-        type: ['USER'],
+        type: [MessageType.USER],
       }),
     ]);
 

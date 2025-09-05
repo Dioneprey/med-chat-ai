@@ -8,6 +8,8 @@ import { ResourceInvalidError } from '../@errors/resource-invalid.error';
 import { ResourceAlreadyExists } from '../@errors/resource-already-exists.error';
 import { HashGenerator } from '../../cryptography/hash-generator';
 import { CodeRepository } from '../../repositories/code.repository';
+import { Role, User } from 'src/domain/chat/entities/user';
+import { Code, CodeType } from 'src/domain/chat/entities/code';
 
 interface RegisterUserUseCaseRequest {
   name: string;
@@ -64,8 +66,7 @@ export class RegisterUserUseCase {
 
     const isInvitationValid =
       invitationExists.expiresAt.getTime() > now &&
-      invitationExists.invitedEmail === email &&
-      invitationExists.used === false;
+      invitationExists.invitedEmail === email;
 
     if (!isInvitationValid) {
       return left(new ResourceInvalidError('Invitation'));
@@ -73,14 +74,16 @@ export class RegisterUserUseCase {
 
     const hashedPassword = await this.hashGenerator.hash(password);
 
-    const [user] = await Promise.all([
-      this.userRepository.create({
-        email,
-        name,
-        companyId: invitationExists.companyId,
-        role: 'USER',
-        password: hashedPassword,
-      }),
+    const user = User.create({
+      email,
+      name,
+      companyId: invitationExists.companyId,
+      role: Role.USER,
+      password: hashedPassword,
+    });
+
+    await Promise.all([
+      this.userRepository.create(user),
       this.invitationRepository.delete(invitationExists),
     ]);
 
@@ -97,12 +100,14 @@ export class RegisterUserUseCase {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    await this.codeRepository.create({
+    const code = Code.create({
       userId: user.id,
       value: refreshToken,
-      type: 'REFRESH_TOKEN',
+      type: CodeType.REFRESH_TOKEN,
       expiresAt: expiresAt,
     });
+
+    await this.codeRepository.create(code);
 
     return right({ accessToken, refreshToken });
   }

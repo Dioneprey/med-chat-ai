@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import {
-  UserKey,
   UserRepository,
   UserRepositoryCountProps,
   UserRepositoryFindByUniqueFieldProps,
 } from 'src/domain/chat/application/repositories/user.repository';
 import { PrismaService } from '../prisma.service';
-import { User } from '@generated/index';
 import { RedisRepository } from '../../redis/redis.service';
+import { User, UserKey } from 'src/domain/chat/entities/user';
+import {
+  PrismaUserMapper,
+  UserWithInclude,
+} from '../mappers/prisma-user-mapper';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
@@ -21,13 +24,11 @@ export class PrismaUserRepository implements UserRepository {
     include,
   }: UserRepositoryFindByUniqueFieldProps) {
     const cacheKey = `user:${key}:${value}`;
-    const cached = await this.redisRepository.get<User>(cacheKey);
+    const cached = await this.redisRepository.get<UserWithInclude>(cacheKey);
 
-    if (cached) return cached;
+    if (cached) return PrismaUserMapper.toDomain(cached);
 
-    if (!value) return null;
-
-    const user = await this.prisma.user.findFirst({
+    const prismaUser = await this.prisma.user.findFirst({
       where: {
         [key]: value,
       },
@@ -36,9 +37,13 @@ export class PrismaUserRepository implements UserRepository {
       },
     });
 
-    await this.redisRepository.set(cacheKey, user, 60);
+    if (!prismaUser) {
+      return null;
+    }
 
-    return user;
+    await this.redisRepository.set(cacheKey, prismaUser, 180);
+
+    return PrismaUserMapper.toDomain(prismaUser);
   }
 
   async count({
@@ -71,50 +76,53 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async create(user: User) {
+    const data = PrismaUserMapper.toPrisma(user);
+
     const createdUser = await this.prisma.user.create({
-      data: {
-        ...user,
-        createdAt: new Date(),
-      },
+      data,
     });
 
     await this.redisRepository.purgeByPrefix(
-      `company:${user.companyId}:usersCount`,
+      `company:${data.companyId}:usersCount`,
     );
 
-    return createdUser;
+    return PrismaUserMapper.toDomain(createdUser);
   }
 
   async save(user: User) {
+    const data = PrismaUserMapper.toPrisma(user);
+
     const updatedUser = await this.prisma.user.update({
       where: {
-        id: user.id,
+        id: data.id,
       },
-      data: user,
+      data: data,
     });
 
-    for (const key of Object.keys(user) as UserKey[]) {
-      await this.redisRepository.del(`user:${key}:${user[key]}`);
+    for (const key of Object.keys(data) as UserKey[]) {
+      await this.redisRepository.del(`user:${key}:${data[key]}`);
     }
     await this.redisRepository.purgeByPrefix(
-      `company:${user.companyId}:usersCount`,
+      `company:${data.companyId}:usersCount`,
     );
 
-    return updatedUser;
+    return PrismaUserMapper.toDomain(updatedUser);
   }
 
   async delete(user: User): Promise<void> {
+    const data = PrismaUserMapper.toPrisma(user);
+
     await this.prisma.user.delete({
       where: {
-        id: user.id,
+        id: data.id,
       },
     });
 
-    for (const key of Object.keys(user) as UserKey[]) {
-      await this.redisRepository.del(`user:${key}:${user[key]}`);
+    for (const key of Object.keys(data) as UserKey[]) {
+      await this.redisRepository.del(`user:${key}:${data[key]}`);
     }
     await this.redisRepository.purgeByPrefix(
-      `company:${user.companyId}:usersCount`,
+      `company:${data.companyId}:usersCount`,
     );
   }
 }

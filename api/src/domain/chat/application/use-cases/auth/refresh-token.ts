@@ -44,7 +44,7 @@ export class RefreshTokenUseCase {
 
     const user = await this.userRepository.findByUniqueField({
       key: 'id',
-      value: tokenRecord.userId,
+      value: tokenRecord.userId.toString(),
     });
 
     if (!user) {
@@ -52,9 +52,9 @@ export class RefreshTokenUseCase {
     }
 
     const accessToken = await this.encrypter.encrypt({
-      sub: user.id,
+      sub: user.id.toString(),
       role: user.role,
-      companyId: user.companyId,
+      companyId: user.companyId.toString(),
     });
 
     const newRefreshToken = await this.encrypter.encrypt({
@@ -64,12 +64,10 @@ export class RefreshTokenUseCase {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    await this.codeRepository.save({
-      id: tokenRecord.id,
-      value: newRefreshToken,
-      type: 'REFRESH_TOKEN',
-      expiresAt: expiresAt,
-    });
+    tokenRecord.value = newRefreshToken;
+    tokenRecord.expiresAt = expiresAt;
+
+    await this.codeRepository.save(tokenRecord);
 
     return right({ accessToken, refreshToken: newRefreshToken });
   }

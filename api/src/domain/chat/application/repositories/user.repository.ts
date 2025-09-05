@@ -1,10 +1,7 @@
-import { Company, User } from '@generated/index';
-import { Optional } from '@generated/runtime/library';
-
-export type UserKey = 'email' | 'id';
+import { User, UserKey } from '../../entities/user';
 
 export interface UserRepositoryFindByUniqueFieldProps {
-  key: 'email' | 'id';
+  key: UserKey;
   value: string;
   include?: {
     company?: boolean;
@@ -17,16 +14,12 @@ export interface UserRepositoryCountProps {
   to?: Date;
 }
 
-interface PrismaUserInclude extends User {
-  company?: Company;
-}
-
 export abstract class UserRepository {
   abstract findByUniqueField({
     key,
     value,
     include,
-  }: UserRepositoryFindByUniqueFieldProps): Promise<PrismaUserInclude | null>;
+  }: UserRepositoryFindByUniqueFieldProps): Promise<User | null>;
 
   abstract count({
     companyId,
@@ -34,9 +27,7 @@ export abstract class UserRepository {
     to,
   }: UserRepositoryCountProps): Promise<number>;
 
-  abstract create(
-    user: Optional<User, 'id' | 'createdAt' | 'updatedAt' | 'role'>,
-  ): Promise<User>;
-  abstract save(user: Partial<User>): Promise<User>;
-  abstract delete(user: Partial<User>): Promise<void>;
+  abstract create(user: User): Promise<User>;
+  abstract save(user: User): Promise<User>;
+  abstract delete(user: User): Promise<void>;
 }
