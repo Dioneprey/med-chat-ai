@@ -19,5 +19,7 @@ jobs:
           cache-dependency-path: ./api/pnpm-lock.yaml
       - run: pnpm install
         working-directory: ./api
+      - run: pnpm prisma generate
+        working-directory: ./api
       - run: pnpm test
         working-directory: ./api
