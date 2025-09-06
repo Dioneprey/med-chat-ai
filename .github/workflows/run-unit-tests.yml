@@ -16,10 +16,15 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: ./api/pnpm-lock.yaml
 
-      - run: corepack enable && corepack prepare pnpm@latest --activate
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
         working-directory: ./api
 
-      - run: pnpm test
+      - name: Run tests
+        run: pnpm test
         working-directory: ./api
