@@ -13,7 +13,6 @@ import { Env } from './env/env';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './http/filter/exceptions.filter';
 import * as Sentry from '@sentry/nestjs';
-import { FastifyPluginCallback } from 'fastify';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

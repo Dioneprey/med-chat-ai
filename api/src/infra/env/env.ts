@@ -11,6 +11,10 @@ export const envSchema = z.object({
   DATABASE_NAME: z.string().default('postgres'),
   DATABASE_PORT: z.string().default('postgres'),
   COOKIE_SECRET: z.string(),
+  SECURE_COOKIE: z
+    .string()
+    .default('false')
+    .transform((value) => value === 'true'),
   JWT_SECRET: z.string(),
   JWT_EXPIRATION: z.string().default('15'),
   JAEGER_URL: z.string().default('http://localhost:4318/v1/traces'),

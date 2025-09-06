@@ -63,7 +63,7 @@ cp .env.example .env
 pnpm install
 
 # Rodar os containers necessários (Postgres, Redis, etc)
-docker compose up -d database
+docker compose up database redis jaeger -d
 
 # Rodar a aplicação em modo desenvolvimento
 pnpm run start:dev
@@ -81,7 +81,7 @@ cd medchat-api
 cp .env.example .env
 # Edite o arquivo .env conforme necessário
 
-# Build e execução de todos os containers (Postgres + API)
+# Build e execução de todos os containers
 docker compose up --build -d
 ```
 

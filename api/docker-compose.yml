@@ -59,7 +59,7 @@ services:
       - medseniorqa-network
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.73.0
     container_name: medseniorqa_jaeger
     ports:
       - '16686:16686' # UI

@@ -22,6 +22,7 @@ type RegisterUserUseCaseResponse = Either<
   ResourceNotFoundError | ResourceInvalidError | ResourceAlreadyExists,
   {
     accessToken: string;
+    refreshToken: string;
   }
 >;
 

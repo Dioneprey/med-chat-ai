@@ -15,6 +15,7 @@ import { FastifyReply } from 'fastify';
 import { ResourceAlreadyExists } from 'src/domain/chat/application/use-cases/@errors/resource-already-exists.error';
 import { RegisterTenantUserUseCase } from 'src/domain/chat/application/use-cases/user/register-tenant-user';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { EnvService } from 'src/infra/env/env.service';
 
 const RegisterTenantBodySchema = z.object({
   email: z.string(),
@@ -30,7 +31,10 @@ const bodyValidationPipe = new ZodValidationPipe(RegisterTenantBodySchema);
 @Controller('/user/tenant')
 @Public()
 export class RegisterTenantController {
-  constructor(private registerTenant: RegisterTenantUserUseCase) {}
+  constructor(
+    private registerTenant: RegisterTenantUserUseCase,
+    private envService: EnvService,
+  ) {}
 
   @Post()
   @HttpCode(201)
@@ -87,12 +91,19 @@ export class RegisterTenantController {
       }
     }
 
-    const accessToken = result.value.accessToken;
+    const { accessToken, refreshToken } = result.value;
 
     reply
       .setCookie('Authentication', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: this.envService.get('SECURE_COOKIE'),
+        path: '/',
+        sameSite: 'lax',
+        maxAge: Number(this.envService.get('JWT_EXPIRATION')) * 60, // 15 minutos
+      })
+      .setCookie('RefreshToken', refreshToken, {
+        httpOnly: true,
+        secure: this.envService.get('SECURE_COOKIE'),
         path: '/',
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60, // 7 dias

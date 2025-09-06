@@ -17,6 +17,7 @@ import { RegisterUserUseCase } from 'src/domain/chat/application/use-cases/user/
 import { ResourceAlreadyExists } from 'src/domain/chat/application/use-cases/@errors/resource-already-exists.error';
 import { ResourceNotFoundError } from 'src/domain/chat/application/use-cases/@errors/resource-not-found.error';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { EnvService } from 'src/infra/env/env.service';
 
 const RegisterUserBodySchema = z.object({
   email: z.string(),
@@ -32,7 +33,10 @@ const bodyValidationPipe = new ZodValidationPipe(RegisterUserBodySchema);
 @Controller('/user')
 @Public()
 export class RegisterUserController {
-  constructor(private registerUser: RegisterUserUseCase) {}
+  constructor(
+    private registerUser: RegisterUserUseCase,
+    private envService: EnvService,
+  ) {}
 
   @Post()
   @HttpCode(201)
@@ -96,12 +100,19 @@ export class RegisterUserController {
       }
     }
 
-    const accessToken = result.value.accessToken;
+    const { accessToken, refreshToken } = result.value;
 
     reply
       .setCookie('Authentication', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: this.envService.get('SECURE_COOKIE'),
+        path: '/',
+        sameSite: 'lax',
+        maxAge: Number(this.envService.get('JWT_EXPIRATION')) * 60, // 15 minutos
+      })
+      .setCookie('RefreshToken', refreshToken, {
+        httpOnly: true,
+        secure: this.envService.get('SECURE_COOKIE'),
         path: '/',
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60, // 7 dias
