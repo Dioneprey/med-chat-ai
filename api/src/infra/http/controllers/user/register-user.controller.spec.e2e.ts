@@ -63,7 +63,6 @@ describe('Register user (E2E)', () => {
       invitationCode: invitation.code,
       name: 'user',
     });
-    console.log(response);
 
     expect(response.statusCode).toBe(201);
     expect(response.body.message).toEqual('Registration successful');
