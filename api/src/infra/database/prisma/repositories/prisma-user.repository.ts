@@ -26,7 +26,16 @@ export class PrismaUserRepository implements UserRepository {
     const cacheKey = `user:${key}:${value}`;
     const cached = await this.redisRepository.get<UserWithInclude>(cacheKey);
 
-    if (cached) return PrismaUserMapper.toDomain(cached);
+    if (cached) {
+      if (include?.company) {
+        if (!cached.company) {
+          for (const key of Object.keys(cached) as UserKey[]) {
+            await this.redisRepository.del(`user:${key}:${cached[key]}`);
+          }
+        }
+        return PrismaUserMapper.toDomain(cached);
+      }
+    }
 
     const prismaUser = await this.prisma.user.findFirst({
       where: {

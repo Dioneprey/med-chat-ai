@@ -16,6 +16,12 @@ services:
       - database
     networks:
       - medseniorqa-network
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3333/api/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   database:
     container_name: medseniorqa_database
     env_file:
