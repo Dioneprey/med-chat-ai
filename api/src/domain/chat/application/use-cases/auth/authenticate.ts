@@ -58,7 +58,7 @@ export class AuthenticateUseCase {
     });
 
     const refreshToken = await this.encrypter.encrypt({
-      sub: userExists.id,
+      sub: userExists.id.toString(),
     });
 
     const expiresAt = new Date();

@@ -8,7 +8,6 @@ export default defineConfig({
     globals: true,
     root: './',
     setupFiles: ['./test/setup-e2e.ts'],
-    testTimeout: 50000,
   },
   plugins: [
     tsConfigPaths(),

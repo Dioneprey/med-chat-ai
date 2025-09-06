@@ -88,13 +88,13 @@ export class RegisterUserUseCase {
     ]);
 
     const accessToken = await this.encrypter.encrypt({
-      sub: user.id,
+      sub: user.id.toString(),
       role: user.role,
-      companyId: user.companyId,
+      companyId: user.companyId.toString(),
     });
 
     const refreshToken = await this.encrypter.encrypt({
-      sub: user.id,
+      sub: user.id.toString(),
     });
 
     const expiresAt = new Date();

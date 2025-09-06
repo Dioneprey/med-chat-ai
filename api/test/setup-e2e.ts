@@ -6,9 +6,6 @@ import { Redis } from 'ioredis';
 import { envSchema } from 'src/infra/env/env';
 import { PrismaClient } from '@generated/index';
 
-config({ path: '.env', override: true });
-config({ path: '.env.test', override: true });
-
 const env = envSchema.parse(process.env);
 
 const prisma = new PrismaClient();
@@ -17,7 +14,7 @@ const redis = new Redis({
   host: env.REDIS_HOST,
   port: env.REDIS_PORT,
   password: env.REDIS_PASSWORD,
-  db: 0,
+  db: 5,
 });
 
 function generateUniqueDatabaseURL(schemaId: string) {
@@ -28,7 +25,6 @@ function generateUniqueDatabaseURL(schemaId: string) {
   const url = new URL(env.DATABASE_URL);
 
   url.searchParams.set('schema', schemaId);
-  console.log({ url: url.toString() });
 
   return url.toString();
 }
@@ -39,13 +35,17 @@ beforeAll(async () => {
   const databaseUrl = generateUniqueDatabaseURL(schemaId);
 
   env.DATABASE_URL = databaseUrl;
+  console.log(env);
 
   await redis.flushdb();
 
-  execSync('pnpm prisma migrate deploy');
+  execSync('prisma migrate deploy', {
+    stdio: 'inherit',
+    env: { ...process.env, DATABASE_URL: databaseUrl },
+  });
 });
 
 afterAll(async () => {
-  // await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`);
+  await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`);
   await prisma.$disconnect();
 });

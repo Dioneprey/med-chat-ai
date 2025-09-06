@@ -6,17 +6,17 @@ export const envSchema = z.object({
     .optional()
     .default('development'),
   DATABASE_URL: z.string(),
-  DATABASE_USER: z.string().default('medseniorqa'),
-  DATABASE_PASSWORD: z.string().default('medseniorqa'),
-  DATABASE_NAME: z.string().default('medseniorqa'),
+  DATABASE_USER: z.string().default('postgres'),
+  DATABASE_PASSWORD: z.string().default('postgres'),
+  DATABASE_NAME: z.string().default('postgres'),
+  DATABASE_PORT: z.string().default('postgres'),
   COOKIE_SECRET: z.string(),
   JWT_SECRET: z.string(),
   JWT_EXPIRATION: z.string().default('15'),
   JAEGER_URL: z.string().default('http://localhost:4318/v1/traces'),
-  FRONT_END_URL: z.string().default('FRONT_END_URL'),
   REDIS_HOST: z.string().optional().default('localhost'),
   REDIS_PORT: z.coerce.number().optional().default(6379),
-  REDIS_PASSWORD: z.string().optional().default('medseniorqa'),
+  REDIS_PASSWORD: z.string().optional().default('redis'),
   PORT: z.coerce.number().optional().default(3333),
   MAIL_HOST: z.string(),
   MAIL_SECURE: z.string(),
@@ -27,7 +27,7 @@ export const envSchema = z.object({
   MAIL_IGNORE_TLS: z.string().transform((value) => value === 'true'),
   OPENAI_API_KEY: z.string(),
   SENTRY_DSN: z.string(),
-  CONTACT_EMAIL: z.string().default('contato@medseniorqa.com'),
+  CONTACT_EMAIL: z.string().default('contato@medchatai.com'),
 });
 
 export type Env = z.infer<typeof envSchema>;
