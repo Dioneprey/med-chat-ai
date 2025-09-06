@@ -11,8 +11,8 @@ import { Logger } from 'nestjs-pino';
 import fastifyCookie from '@fastify/cookie';
 import { Env } from './env/env';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AllExceptionsFilter } from './http/filter/exceptions.filter';
 import * as Sentry from '@sentry/nestjs';
+import { AllExceptionsFilter } from './http/filter/exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
