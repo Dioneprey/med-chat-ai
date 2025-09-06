@@ -16,24 +16,50 @@ jobs:
           POSTGRESQL_USERNAME: docker
           POSTGRESQL_PASSWORD: docker
           POSTGRESQL_DATABASE: postgres
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://docker:docker@localhost:5432/postgres?schema=public
+      DATABASE_USER: docker
+      DATABASE_PASSWORD: docker
+      DATABASE_NAME: postgres
+      DATABASE_PORT: "5432"
+      COOKIE_SECRET: test-cookie-secret
+      JWT_SECRET: test-jwt-secret
+      MAIL_HOST: smtp.test
+      MAIL_SECURE: "false"
+      MAIL_PORT: "1025"
+      MAIL_USER: test
+      MAIL_USER_EMAIL: test@test.com
+      MAIL_PASSWORD: test
+      MAIL_IGNORE_TLS: "true"
+      OPENAI_API_KEY: test-openai
+      SENTRY_DSN: test-sentry
+      CONTACT_EMAIL: contato@medchatai.com
+      REDIS_HOST: localhost
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ""
 
     steps:
       - uses: actions/checkout@v5
-
       - uses: pnpm/action-setup@v2
-
         with:
           version: 10.14.0
-
       - uses: actions/setup-node@v5
         with:
           node-version: "20"
           cache: "pnpm"
           cache-dependency-path: ./api/pnpm-lock.yaml
-
       - run: pnpm install
         working-directory: ./api
-
       - run: pnpm prisma generate
         working-directory: ./api
       - run: pnpm run test:e2e
