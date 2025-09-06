@@ -16,10 +16,10 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: ./api/pnpm-lock.yaml
 
-      # Instalar PNPM globalmente
-      - run: npm install -g pnpm
-      - run: pnpm install
+      - run: corepack enable && corepack prepare pnpm@latest --activate
+
+      - run: pnpm install --frozen-lockfile
         working-directory: ./api
 
-      - run: pnpm run test
+      - run: pnpm test
         working-directory: ./api
