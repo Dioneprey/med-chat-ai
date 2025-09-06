@@ -12,16 +12,22 @@ import {
 import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
+import { JwtService } from '@nestjs/jwt';
+import { Role } from 'src/domain/chat/entities/user';
+import { InvitationFactory } from 'test/factories/make-invitation';
 
-describe('Authenticate (E2E)', () => {
+describe('Revoke invitation (E2E)', () => {
   let app: INestApplication;
   let userFactory: UserFactory;
   let companyFactory: CompanyFactory;
+  let invitationFactory: InvitationFactory;
+
+  let jwt: JwtService;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [UserFactory, CompanyFactory],
+      providers: [UserFactory, CompanyFactory, InvitationFactory],
     }).compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -34,6 +40,8 @@ describe('Authenticate (E2E)', () => {
 
     userFactory = moduleRef.get(UserFactory);
     companyFactory = moduleRef.get(CompanyFactory);
+    invitationFactory = moduleRef.get(InvitationFactory);
+    jwt = moduleRef.get(JwtService);
 
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
@@ -43,24 +51,40 @@ describe('Authenticate (E2E)', () => {
     await app.close();
   });
 
-  test('[POST] /auth', async () => {
+  test('[DELETE] /invitation', async () => {
     const company = await companyFactory.makePrismaCompany({
       name: 'Company',
     });
 
-    await userFactory.makePrismaUser({
+    const user = await userFactory.makePrismaUser({
       name: 'John Doe',
       email: 'john.doe@gmail.com',
       password: await hash('123456', 8),
+      role: Role.ADMIN,
       companyId: company.id,
     });
 
-    const response = await request(app.getHttpServer()).post('/auth').send({
-      email: 'john.doe@gmail.com',
-      password: '123456',
+    const invitedEmail = 'revoked@email.com';
+
+    await invitationFactory.makePrismaInvitation({
+      invitedEmail: invitedEmail,
+      companyId: company.id,
     });
 
+    const accessToken = jwt.sign({
+      sub: user.id.toString(),
+      companyId: company.id.toString(),
+      role: user.role,
+    });
+
+    const response = await request(app.getHttpServer())
+      .delete(`/invitation`)
+      .set('Cookie', [`Authentication=${accessToken}`])
+      .send({
+        email: invitedEmail,
+      });
+
     expect(response.statusCode).toBe(200);
-    expect(response.body.message).toEqual('Login successful');
+    expect(response.body.message).toEqual('Invitation revoked successfully');
   });
 });

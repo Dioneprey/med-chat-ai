@@ -12,11 +12,14 @@ import {
 import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
+import { JwtService } from '@nestjs/jwt';
 
-describe('Authenticate (E2E)', () => {
+describe('Send chat message (E2E)', () => {
   let app: INestApplication;
   let userFactory: UserFactory;
   let companyFactory: CompanyFactory;
+
+  let jwt: JwtService;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -34,6 +37,7 @@ describe('Authenticate (E2E)', () => {
 
     userFactory = moduleRef.get(UserFactory);
     companyFactory = moduleRef.get(CompanyFactory);
+    jwt = moduleRef.get(JwtService);
 
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
@@ -43,24 +47,40 @@ describe('Authenticate (E2E)', () => {
     await app.close();
   });
 
-  test('[POST] /auth', async () => {
+  test('[POST] /chat/message', async () => {
     const company = await companyFactory.makePrismaCompany({
       name: 'Company',
     });
 
-    await userFactory.makePrismaUser({
+    const user = await userFactory.makePrismaUser({
       name: 'John Doe',
       email: 'john.doe@gmail.com',
       password: await hash('123456', 8),
       companyId: company.id,
     });
 
-    const response = await request(app.getHttpServer()).post('/auth').send({
-      email: 'john.doe@gmail.com',
-      password: '123456',
+    const accessToken = jwt.sign({
+      sub: user.id.toString(),
+      companyId: company.id.toString(),
+      role: user.role,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body.message).toEqual('Login successful');
+    const response = await request(app.getHttpServer())
+      .post(`/chat/message`)
+      .set('Cookie', [`Authentication=${accessToken}`])
+      .send({
+        message: 'Olá, quantos é 1 + 5?',
+      });
+
+    expect(response.statusCode).toBe(201);
+    expect(response.body).toEqual({
+      message: expect.objectContaining({
+        id: expect.any(String),
+        chatId: expect.any(String),
+        content: expect.any(String),
+        type: expect.any(String),
+        createdAt: expect.any(String),
+      }),
+    });
   });
 });

@@ -35,11 +35,10 @@ beforeAll(async () => {
   const databaseUrl = generateUniqueDatabaseURL(schemaId);
 
   env.DATABASE_URL = databaseUrl;
-  console.log(env);
 
   await redis.flushdb();
 
-  execSync('prisma migrate deploy', {
+  execSync(`prisma db push --accept-data-loss`, {
     stdio: 'inherit',
     env: { ...process.env, DATABASE_URL: databaseUrl },
   });
