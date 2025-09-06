@@ -15,9 +15,9 @@ import { RegisterTenantUserUseCase } from 'src/domain/chat/application/use-cases
 import { RegisterUserUseCase } from 'src/domain/chat/application/use-cases/user/register-user';
 import { GetCompanyByNameController } from './controllers/company/get-company-by-name.controller';
 import { GetCompanyByNameUseCase } from 'src/domain/chat/application/use-cases/company/get-company-by-name';
-import { RegisterInvitationController } from './controllers/Invitation/register-invitation.controller';
+import { RegisterInvitationController } from './controllers/invitation/register-invitation.controller';
 import { RegisterInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/register-invitation';
-import { RevokeInvitationController } from './controllers/Invitation/revoke-invitation.controller';
+import { RevokeInvitationController } from './controllers/invitation/revoke-invitation.controller';
 import { RevokeInvitationUseCase } from 'src/domain/chat/application/use-cases/invitation/revoke-invitation';
 import { ConversationModule } from '../conversation/conversation.module';
 import { SendChatMessageController } from './controllers/chat/send-chat-message.controller';

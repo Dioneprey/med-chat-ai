@@ -27,7 +27,6 @@ export class FetchAllChatsController {
   constructor(private fetchAllChats: FetchAllChatsUseCaseUseCase) {}
 
   @Get()
-  @HttpCode(201)
   @ApiOperation({
     summary: 'Fetch all chats',
     description: 'Retorna uma lista paginada de chats do usuário',

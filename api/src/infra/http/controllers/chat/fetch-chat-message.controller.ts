@@ -45,7 +45,6 @@ export class FetchChatMessageController {
   constructor(private fetchChatMessage: FetchChatMessageUseCase) {}
 
   @Get()
-  @HttpCode(201)
   @ApiOperation({
     summary: 'Fetch messages from a chat',
     description:

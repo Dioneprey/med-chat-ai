@@ -1,0 +1,39 @@
+name: Run E2E Tests
+
+on: [pull_request]
+
+jobs:
+  run-e2e-tests:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: bitnami/postgresql
+        ports:
+          - 5432:5432
+        env:
+          POSTGRESQL_USERNAME: docker
+          POSTGRESQL_PASSWORD: docker
+          POSTGRESQL_DATABASE: postgres
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v2
+
+        with:
+          version: 10.14.0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: ./api/pnpm-lock.yaml
+
+      - run: pnpm install
+        working-directory: ./api
+
+      - run: pnpm run test:e2e
+        env:
+          DATABASE_URL: "postgresql://docker:docker@localhost:5432/postgres?schema=public"

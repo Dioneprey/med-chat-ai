@@ -16,6 +16,10 @@ export class RedisRepository {
   }
 
   async get<T>(key: string): Promise<T | null> {
+    if (this.envService.get('NODE_ENV') === 'test') {
+      return null;
+    }
+
     const data = await this.client.get(key);
     if (!data) return null;
 
@@ -27,6 +31,10 @@ export class RedisRepository {
   }
 
   async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+    if (this.envService.get('NODE_ENV') === 'test') {
+      return;
+    }
+
     const stringified = JSON.stringify(value);
     if (ttlSeconds) {
       await this.client.set(key, stringified, 'EX', ttlSeconds);
@@ -36,10 +44,18 @@ export class RedisRepository {
   }
 
   async del(key: string): Promise<void> {
+    if (this.envService.get('NODE_ENV') === 'test') {
+      return;
+    }
+
     await this.client.del(key);
   }
 
   async purgeByPrefix(prefix: string) {
+    if (this.envService.get('NODE_ENV') === 'test') {
+      return;
+    }
+
     return new Promise<void>((resolve, reject) => {
       const stream = this.client.scanStream({
         match: `${prefix}*`,

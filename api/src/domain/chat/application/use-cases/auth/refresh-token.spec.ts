@@ -1,6 +1,4 @@
 import { expect } from 'vitest';
-import { AuthenticateUseCase } from './authenticate';
-import { FakeHasher } from 'test/cryptography/fake-hasher';
 import { FakeEncrypter } from 'test/cryptography/fake-encrypter';
 import { InMemoryUserRepository } from 'test/repositories/in-memory-user.repository';
 import { InMemoryCodeRepository } from 'test/repositories/in-memory-code.repository';
