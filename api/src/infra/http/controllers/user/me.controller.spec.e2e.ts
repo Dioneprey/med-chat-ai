@@ -12,11 +12,13 @@ import {
 import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
+import { JwtService } from '@nestjs/jwt';
 
-describe('Authenticate (E2E)', () => {
+describe('Me (E2E)', () => {
   let app: INestApplication;
   let userFactory: UserFactory;
   let companyFactory: CompanyFactory;
+  let jwt: JwtService;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -34,6 +36,7 @@ describe('Authenticate (E2E)', () => {
 
     userFactory = moduleRef.get(UserFactory);
     companyFactory = moduleRef.get(CompanyFactory);
+    jwt = moduleRef.get(JwtService);
 
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
@@ -43,24 +46,36 @@ describe('Authenticate (E2E)', () => {
     await app.close();
   });
 
-  test('[POST] /auth', async () => {
+  test('[GET] /me', async () => {
     const company = await companyFactory.makePrismaCompany({
       name: 'Company',
     });
 
-    await userFactory.makePrismaUser({
+    const user = await userFactory.makePrismaUser({
       name: 'John Doe',
       email: 'john.doe@gmail.com',
       password: await hash('123456', 8),
       companyId: company.id,
     });
 
-    const response = await request(app.getHttpServer()).post('/auth').send({
-      email: 'john.doe@gmail.com',
-      password: '123456',
+    const accessToken = jwt.sign({
+      sub: user.id.toString(),
+      companyId: company.id.toString(),
+      role: user.role,
     });
 
+    const response = await request(app.getHttpServer())
+      .get('/me')
+      .set('Cookie', [`Authentication=${accessToken}`])
+      .send();
+
     expect(response.statusCode).toBe(200);
-    expect(response.body.message).toEqual('Login successful');
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        sub: user.id.toString(),
+        companyId: company.id.toString(),
+        role: user.role,
+      }),
+    );
   });
 });

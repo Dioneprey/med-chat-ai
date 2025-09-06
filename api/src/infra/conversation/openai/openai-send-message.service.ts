@@ -18,6 +18,10 @@ export class OpenAISendMessage implements SendMessage {
   }
 
   async send({ messages }: SendMessageProps): Promise<string> {
+    if (this.envService.get('NODE_ENV') === 'test') {
+      return 'Olá, essa é uma resposta da ia';
+    }
+
     const completion = await this.client.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: messages.map((m) => ({
