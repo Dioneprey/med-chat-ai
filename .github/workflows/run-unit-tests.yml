@@ -16,6 +16,8 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: ./api/pnpm-lock.yaml
 
+      # Instalar PNPM globalmente
+      - run: npm install -g pnpm
       - run: pnpm install
         working-directory: ./api
 
