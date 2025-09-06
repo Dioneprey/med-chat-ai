@@ -62,6 +62,8 @@ jobs:
         working-directory: ./api
       - run: pnpm prisma generate
         working-directory: ./api
+      - run: pnpm prisma migrate deploy
+        working-directory: ./api
       - run: pnpm run test:e2e
         working-directory: ./api
         env:
