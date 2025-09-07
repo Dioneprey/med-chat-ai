@@ -31,6 +31,7 @@ async function bootstrap() {
   const port = envService.get('PORT');
   const cookieSecret = envService.get('COOKIE_SECRET');
   const sentryDsn = envService.get('SENTRY_DSN');
+  const kongUrl = envService.get('KONG_URL');
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -52,8 +53,8 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['*'],
-    methods: ['*'],
+    origin: [kongUrl],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
 
   app.useLogger(app.get(Logger));

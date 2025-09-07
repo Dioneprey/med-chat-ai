@@ -9,6 +9,7 @@ export class PrismaMessageMapper {
         ...raw,
         chatId: new UniqueEntityID(raw.chatId),
         type: MessageType[raw.type],
+        createdAt: raw.createdAt,
       },
       new UniqueEntityID(raw.id),
     );

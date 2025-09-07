@@ -80,14 +80,14 @@ export class RegisterInvitationUseCase {
 
     await this.invitationRepository.create(invitation);
 
-    const companyName = userExists!.company!.name;
+    const companyName = userExists?.company?.name;
 
     await this.sendEmailSchedule.enqueueJob({
       recipientEmail: invitedEmail,
       template: EmailTemplate.INVITATION,
       variables: {
         invitationCode: invitationCode,
-        companyName: companyName,
+        companyName: companyName || '',
       },
       subject: `Convite para se juntar à ${companyName}!`,
     });

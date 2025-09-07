@@ -12,6 +12,7 @@ export const envSchema = z.object({
   DATABASE_PORT: z.string().default('postgres'),
   COOKIE_SECRET: z.string().default('supersecretmedchat'),
   JWT_SECRET: z.string().default('supersecretmedchat'),
+  KONG_URL: z.string().default('http://localhost:8000'),
   SECURE_COOKIE: z
     .string()
     .default('false')

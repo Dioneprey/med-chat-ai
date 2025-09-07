@@ -136,9 +136,12 @@ export class PrismaChatRepository implements ChatRepository {
         },
       },
     });
-
     await Promise.all([
       this.redisRepository.purgeByPrefix(`chat:${data.chatId}`),
+
+      this.redisRepository.purgeByPrefix(
+        `company:${createdMessage.chat.companyId}`,
+      ),
 
       this.redisRepository.del(`user:${createdMessage.chat.userId}:chats`),
 

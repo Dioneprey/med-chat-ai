@@ -54,7 +54,7 @@ export class Code extends Entity<CodeProps> {
     const code = new Code(
       {
         ...props,
-        createdAt: new Date(),
+        createdAt: props.createdAt || new Date(),
       },
       id,
     );

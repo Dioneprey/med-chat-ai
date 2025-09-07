@@ -50,62 +50,79 @@ Principais funcionalidades:
 
 ## Instalação e execução
 
-## Opção 1: Rodar localmente (Node + PNPM)
+## Opção 1: Rodar tudo via Docker
 
 ```bash
-# Clonar o repositório
+# 1️⃣ Clonar o repositório
 git clone https://github.com/Dioneprey/med-chat-ai.git
 # Entrar na pasta do repositório
 cd med-chat-api
 
-# Copiar variáveis de ambiente
-cp .env.example .env
+# 2️⃣ Copiar variáveis de ambiente
+cp api/.env.example api/.env
+cp auth/.env.example auth/.env
 # Edite o arquivo .env conforme necessário
 
-# Instalar pnpm ( se não tiver )
-npm install pnpm -g
-
-# Instalar dependências
-pnpm install
-
-# Rodar os containers necessários (Postgres, Redis, etc)
-docker compose up database redis jaeger -d
-
-# Aplicar as migrations e generate do prisma
-pnpm run db:deploy
-
-# Rodar a aplicação em modo desenvolvimento
-pnpm run start:dev
-```
-
-## Opção 2: Rodar tudo via Docker
-
-```bash
-# Clonar o repositório
-git clone https://github.com/Dioneprey/med-chat-ai.git
-# Entrar na pasta do repositório
-cd medchat-api
-
-# Copiar variáveis de ambiente
-cp .env.example .env
-# Edite o arquivo .env conforme necessário
-
-# Build e execução de todos os containers
+# 3️⃣ Build e execução de todos os containers
 docker compose up --build -d
 ```
 
-## URLs
+## Opção 2: Rodar localmente (Node + PNPM)
 
-- **API principal:** [http://localhost:3333](http://localhost:3333)
-- **Swagger (documentação da API):** [http://localhost:3333/docs](http://localhost:3333/docs)
-- **Jaeger (tracing):** [http://localhost:16686](http://localhost:16686)
-- **Bull Board (monitoramento das filas):** [http://localhost:3333/api/queues](http://localhost:3333/api/queues)
+```bash
+# 1️⃣ Clonar o repositório
+git clone https://github.com/Dioneprey/med-chat-ai.git
+cd med-chat-ai
+
+# 2️⃣ Copiar variáveis de ambiente
+cp api/.env.example api/.env
+cp auth/.env.example auth/.env
+# Edite os arquivos .env conforme necessário
+
+# 3️⃣ Instalar pnpm (se não tiver)
+npm install -g pnpm
+
+# 4️⃣ Subir serviços principais em modo desenvolvimento
+
+## 🔹 Serviço de autenticação (Auth) - Terminal 1
+cd auth
+pnpm install           # Instalar dependências
+pnpm run db:deploy     # Aplicar migrations e gerar Prisma Client
+pnpm run start:dev     # Rodar a API
+
+## 🔹 Serviço de perguntas e respostas (QA) - Terminal 2
+cd ../api
+pnpm install           # Instalar dependências
+pnpm run db:deploy     # Aplicar migrations e gerar Prisma Client
+pnpm run start:dev     # Rodar a API
+```
+
+# 🌐 URLs
+
+## 📘 API de Perguntas e Respostas (QA)
+
+- Endpoint: [http://localhost:8000/qa/api](http://localhost:8000/qa/api)
+- Swagger: [http://localhost:8000/qa/api/docs](http://localhost:8000/qa/api/docs)
+
+---
+
+## 🔑 API de Autenticação (Auth)
+
+- Endpoint: [http://localhost:8000/auth/api](http://localhost:8000/auth/api)
+- Swagger: [http://localhost:8000/auth/api/docs](http://localhost:8000/auth/api/docs)
+
+---
+
+## 🔍 Observabilidade
+
+- **Jaeger (Tracing):** [http://localhost:16686](http://localhost:16686)
+- **Bull Board (Filas):** [http://localhost:3333/api/queues](http://localhost:3333/api/queues)
 
 ## 🔄 Fluxo de uso da API
 
 Para testar a aplicação de forma rápida, siga o fluxo abaixo:
 
-### 1. Criação de conta
+### 1. Criação de conta (AUTH)
 
 **Admin**
 
@@ -117,7 +134,7 @@ Para testar a aplicação de forma rápida, siga o fluxo abaixo:
 
 ---
 
-### 2. Autenticação
+### 2. Autenticação (AUTH)
 
 - **Login**
 
@@ -129,13 +146,13 @@ Para testar a aplicação de forma rápida, siga o fluxo abaixo:
 
 ---
 
-### 3. Usuário logado
+### 3. Usuário logado (AUTH)
 
 - `GET /users/me` → retorna os dados do usuário autenticado.
 
 ---
 
-### 4. Chats
+### 4. Chats (QA)
 
 - `GET /chat?pageIndex=1` → lista todos os chats do usuário.
 - `GET /chat/:chatId/messages` → lista mensagens de um chat específico.
@@ -143,25 +160,25 @@ Para testar a aplicação de forma rápida, siga o fluxo abaixo:
 
 ---
 
-### 5. Convites
+### 5. Convites (AUTH)
 
 - `POST /invitation` → cria um convite.
 - `DELETE /invitation` → revoga um convite existente.
 
 ---
 
-### 6. Empresas
+### 6. Empresas (AUTH)
 
 - `GET /company?name=<empresa>` → busca uma empresa pelo nome.
 
 ---
 
-### 7. Dashboard (Admin)
+### 7. Dashboard (Admin) (QA)
 
 - `GET /dashboard?from=<YYYY-MM-DD>&to=<YYYY-MM-DD>` → busca dados de dashboard do admin no período especificado.
 
 ---
 
-### 8. Healthcheck
+### 8. Healthcheck (QA / AUTH)
 
 - `GET /health` → verifica se a API está rodando.

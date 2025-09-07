@@ -92,7 +92,7 @@ export class User extends Entity<UserProps> {
     const user = new User(
       {
         ...props,
-        createdAt: new Date(),
+        createdAt: props.createdAt || new Date(),
       },
       id,
     );

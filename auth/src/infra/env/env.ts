@@ -31,6 +31,7 @@ export const envSchema = z.object({
   MAIL_PASSWORD: z.string(),
   MAIL_IGNORE_TLS: z.string().transform((value) => value === 'true'),
   SENTRY_DSN: z.string(),
+  KONG_URL: z.string().default('http://localhost:8000'),
   CONTACT_EMAIL: z.string().default('contato@medchatai.com'),
 });
 

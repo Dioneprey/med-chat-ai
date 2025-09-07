@@ -50,7 +50,7 @@ export class Message extends Entity<MessageProps> {
     const message = new Message(
       {
         ...props,
-        createdAt: new Date(),
+        createdAt: props.createdAt || new Date(),
       },
       id,
     );

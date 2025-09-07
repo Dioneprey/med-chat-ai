@@ -56,7 +56,7 @@ export class Invitation extends Entity<InvitationProps> {
     const invitation = new Invitation(
       {
         ...props,
-        createdAt: new Date(),
+        createdAt: props.createdAt || new Date(),
       },
       id,
     );
