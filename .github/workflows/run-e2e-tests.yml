@@ -51,6 +51,7 @@ jobs:
           KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
           CONFLUENT_METRICS_ENABLE: "false"
           CONFLUENT_SUPPORT_CUSTOMER_ID: "anonymous"
+          KAFKAJS_NO_PARTITIONER_WARNING: 1
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://docker:docker@localhost:5432/postgres?schema=public

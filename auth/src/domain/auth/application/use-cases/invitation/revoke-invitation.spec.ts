@@ -1,6 +1,6 @@
 import { InMemoryUserRepository } from 'test/repositories/in-memory-user.repository';
 import { makeUser } from 'test/factories/make-user';
-import { Role } from 'src/domain/chat/entities/user';
+import { Role } from 'src/domain/auth/entities/user';
 import { makeCompany } from 'test/factories/make-company';
 import { InMemoryInvitationRepository } from 'test/repositories/in-memory-invitation.repository';
 import { RevokeInvitationUseCase } from './revoke-invitation';

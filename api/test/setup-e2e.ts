@@ -35,7 +35,6 @@ beforeAll(async () => {
   const databaseUrl = generateUniqueDatabaseURL(schemaId);
 
   env.DATABASE_URL = databaseUrl;
-  console.log({ databaseUrl });
 
   await redis.flushdb();
 
