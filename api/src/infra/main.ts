@@ -45,6 +45,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  document.servers = [{ url: '/qa' }];
   SwaggerModule.setup('api/docs', app, document);
 
   await app.register(fastifyCookie as any, {
@@ -59,12 +60,14 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
-  Sentry.init({
-    dsn: sentryDsn,
-    environment: 'CHAT',
-    tracesSampleRate: 1.0,
-    sendDefaultPii: true,
-  });
+  if (sentryDsn) {
+    Sentry.init({
+      dsn: sentryDsn,
+      environment: 'CHAT',
+      tracesSampleRate: 1.0,
+      sendDefaultPii: true,
+    });
+  }
 
   await app.listen(port, '0.0.0.0').then(() => {
     console.log(`[MedChatAI - API] HTTP server running on port: ${port}!`);

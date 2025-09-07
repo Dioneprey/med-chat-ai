@@ -9,6 +9,7 @@ services:
     environment:
       - DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_USER}@database_auth:5432/${DATABASE_NAME}
       - REDIS_HOST=redis_auth
+      - REDIS_PORT=6379
       - KAFKA_URL=kafka:29092
       - JAEGER_URL=http://jaeger:4318/v1/traces
       - KONG_URL=http://kong:8000

@@ -41,6 +41,8 @@ Principais funcionalidades:
 - **Docker**
 - **OpenTelemetry (OTel) com Jaeger**
 - **Sentry**
+- **Kafka**
+- **Kong ( API Gateway )**
 - **GitHub Actions**
   - Testes unitários (em todo **push**)
   - Testes E2E (em **pull requests**)
@@ -56,7 +58,7 @@ Principais funcionalidades:
 # 1️⃣ Clonar o repositório
 git clone https://github.com/Dioneprey/med-chat-ai.git
 # Entrar na pasta do repositório
-cd med-chat-api
+cd med-chat-ai
 
 # 2️⃣ Copiar variáveis de ambiente
 cp api/.env.example api/.env
@@ -64,7 +66,7 @@ cp auth/.env.example auth/.env
 # Edite o arquivo .env conforme necessário
 
 # 3️⃣ Build e execução de todos os containers
-docker compose up --build -d
+docker compose --profile apis up --build -d
 ```
 
 ## Opção 2: Rodar localmente (Node + PNPM)
@@ -83,7 +85,7 @@ cp auth/.env.example auth/.env
 npm install -g pnpm
 
 # 4️⃣ Subir serviços principais em modo desenvolvimento
-
+docker compose up --build -d
 ## 🔹 Serviço de autenticação (Auth) - Terminal 1
 cd auth
 pnpm install           # Instalar dependências
@@ -116,7 +118,7 @@ pnpm run start:dev     # Rodar a API
 ## 🔍 Observabilidade
 
 - **Jaeger (Tracing):** [http://localhost:16686](http://localhost:16686)
-- **Bull Board (Filas):** [http://localhost:3333/api/queues](http://localhost:3333/api/queues)
+- **Bull Board (Filas Auth):** [http://localhost:8000/auth/api/queues](http://localhost:8000/auth/api/queues)
 
 ## 🔄 Fluxo de uso da API
 
