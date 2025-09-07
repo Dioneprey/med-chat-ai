@@ -16,6 +16,14 @@ jobs:
           POSTGRESQL_USERNAME: docker
           POSTGRESQL_PASSWORD: docker
           POSTGRESQL_DATABASE: postgres
+      postgres_2:
+        image: bitnami/postgresql
+        ports:
+          - 5433:5432
+        env:
+          POSTGRESQL_USERNAME: docker
+          POSTGRESQL_PASSWORD: docker
+          POSTGRESQL_DATABASE: postgres
       redis:
         image: redis:7
         ports:
@@ -95,7 +103,7 @@ jobs:
       - run: pnpm run test:e2e
         working-directory: ./api
         env:
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/qa?schema=public"
+          DATABASE_URL: "postgresql://docker:docker@localhost:5432/postgres?schema=public"
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v2
         with:
@@ -114,4 +122,4 @@ jobs:
       - run: pnpm run test:e2e
         working-directory: ./auth
         env:
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/auth?schema=public"
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"
