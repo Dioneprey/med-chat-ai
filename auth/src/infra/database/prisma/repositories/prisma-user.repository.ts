@@ -34,8 +34,9 @@ export class PrismaUserRepository implements UserRepository {
           for (const key of Object.keys(cached) as UserKey[]) {
             await this.redisRepository.del(`user:${key}:${cached[key]}`);
           }
+        } else {
+          return PrismaUserMapper.toDomain(cached);
         }
-        return PrismaUserMapper.toDomain(cached);
       }
     }
 

@@ -7,6 +7,8 @@ export default defineConfig({
     include: ['**/*.spec.ts'],
     globals: true,
     root: './',
+    testTimeout: 1000 * 5 * 60,
+    hookTimeout: 1000 * 5 * 60,
   },
   plugins: [
     tsConfigPaths(),

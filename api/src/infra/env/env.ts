@@ -12,6 +12,7 @@ export const envSchema = z.object({
   DATABASE_PORT: z.string().default('postgres'),
   COOKIE_SECRET: z.string().default('supersecretmedchat'),
   JWT_SECRET: z.string().default('supersecretmedchat'),
+  KONG_URL: z.string().default('http://localhost:8000'),
   SECURE_COOKIE: z
     .string()
     .default('false')
@@ -24,7 +25,7 @@ export const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional().default('redis'),
   PORT: z.coerce.number().optional().default(3333),
   OPENAI_API_KEY: z.string(),
-  SENTRY_DSN: z.string(),
+  SENTRY_DSN: z.string().optional(),
   CONTACT_EMAIL: z.string().default('contato@medchatai.com'),
 });
 

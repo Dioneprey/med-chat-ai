@@ -55,7 +55,7 @@ export class Chat extends Entity<ChatProps> {
     const chat = new Chat(
       {
         ...props,
-        createdAt: new Date(),
+        createdAt: props.createdAt || new Date(),
       },
       id,
     );

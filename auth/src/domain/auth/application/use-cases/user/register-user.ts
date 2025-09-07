@@ -66,7 +66,7 @@ export class RegisterUserUseCase {
     const now = Date.now();
 
     const isInvitationValid =
-      invitationExists.expiresAt.getTime() > now &&
+      new Date(invitationExists.expiresAt).getTime() > now &&
       invitationExists.invitedEmail === email;
 
     if (!isInvitationValid) {

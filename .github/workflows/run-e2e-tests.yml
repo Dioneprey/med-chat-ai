@@ -16,6 +16,14 @@ jobs:
           POSTGRESQL_USERNAME: docker
           POSTGRESQL_PASSWORD: docker
           POSTGRESQL_DATABASE: postgres
+      postgres_2:
+        image: bitnami/postgresql
+        ports:
+          - 5433:5432
+        env:
+          POSTGRESQL_USERNAME: docker
+          POSTGRESQL_PASSWORD: docker
+          POSTGRESQL_DATABASE: postgres
       redis:
         image: redis:7
         ports:
@@ -74,6 +82,7 @@ jobs:
       REDIS_HOST: localhost
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ""
+      KAFKA_URL: "localhost:9092"
 
     steps:
       - uses: actions/checkout@v5
@@ -94,7 +103,7 @@ jobs:
       - run: pnpm run test:e2e
         working-directory: ./api
         env:
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/postgres?schema=public"
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v2
         with:
@@ -104,13 +113,21 @@ jobs:
           node-version: "20"
           cache: "pnpm"
           cache-dependency-path: ./auth/pnpm-lock.yaml
+        env:
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"
       - run: pnpm install
         working-directory: ./auth
+        env:
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"
       - run: pnpm prisma generate
         working-directory: ./auth
+        env:
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"
       - run: pnpm prisma migrate deploy
         working-directory: ./auth
+        env:
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"
       - run: pnpm run test:e2e
         working-directory: ./auth
         env:
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/postgres?schema=public"
+          DATABASE_URL: "postgresql://docker:docker@localhost:5433/postgres?schema=public"

@@ -1,5 +1,3 @@
-import { config } from 'dotenv';
-
 import { randomUUID } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { Redis } from 'ioredis';
@@ -8,7 +6,7 @@ import { PrismaClient } from '@generated/index';
 
 const env = envSchema.parse(process.env);
 
-const prisma = new PrismaClient();
+let prisma: PrismaClient;
 
 const redis = new Redis({
   host: env.REDIS_HOST,
@@ -32,16 +30,29 @@ function generateUniqueDatabaseURL(schemaId: string) {
 const schemaId = randomUUID();
 
 beforeAll(async () => {
+  const schemaId = randomUUID();
   const databaseUrl = generateUniqueDatabaseURL(schemaId);
 
-  env.DATABASE_URL = databaseUrl;
+  const tempPrisma = new PrismaClient({
+    datasources: { db: { url: env.DATABASE_URL } }, // Use base DATABASE_URL without schema
+  });
 
-  await redis.flushdb();
+  await tempPrisma.$executeRawUnsafe(
+    `CREATE SCHEMA IF NOT EXISTS "${schemaId}"`,
+  );
 
-  execSync(`prisma db push --accept-data-loss`, {
+  await tempPrisma.$disconnect();
+
+  process.env.DATABASE_URL = databaseUrl;
+
+  execSync(`pnpm prisma db push --accept-data-loss`, {
     stdio: 'inherit',
     env: { ...process.env, DATABASE_URL: databaseUrl },
   });
+
+  prisma = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+
+  await redis.flushdb();
 });
 
 afterAll(async () => {

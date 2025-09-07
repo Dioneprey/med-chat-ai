@@ -39,7 +39,7 @@ export class Company extends Entity<CompanyProps> {
     const company = new Company(
       {
         ...props,
-        createdAt: new Date(),
+        createdAt: props.createdAt || new Date(),
       },
       id,
     );

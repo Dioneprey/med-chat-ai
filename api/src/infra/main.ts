@@ -31,7 +31,7 @@ async function bootstrap() {
   const port = envService.get('PORT');
   const cookieSecret = envService.get('COOKIE_SECRET');
   const sentryDsn = envService.get('SENTRY_DSN');
-  const nodeEnv = envService.get('NODE_ENV');
+  const kongUrl = envService.get('KONG_URL');
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -45,6 +45,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  document.servers = [{ url: '/qa' }];
   SwaggerModule.setup('api/docs', app, document);
 
   await app.register(fastifyCookie as any, {
@@ -53,18 +54,20 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['*'],
-    methods: ['*'],
+    origin: [kongUrl],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
 
   app.useLogger(app.get(Logger));
 
-  Sentry.init({
-    dsn: sentryDsn,
-    environment: nodeEnv,
-    tracesSampleRate: 1.0,
-    sendDefaultPii: true,
-  });
+  if (sentryDsn) {
+    Sentry.init({
+      dsn: sentryDsn,
+      environment: 'CHAT',
+      tracesSampleRate: 1.0,
+      sendDefaultPii: true,
+    });
+  }
 
   await app.listen(port, '0.0.0.0').then(() => {
     console.log(`[MedChatAI - API] HTTP server running on port: ${port}!`);
