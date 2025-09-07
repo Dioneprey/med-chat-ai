@@ -14,17 +14,13 @@ services:
       - JAEGER_URL=http://jaeger:4318/v1/traces
       - KONG_URL=http://kong:8000
     ports:
-      - '${PORT}:3334'
+      - '${PORT}:${PORT}'
     depends_on:
       - database_auth
     networks:
       - medchatai-network
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'node -e ''require("http").get("http://localhost:3334/api/health", res => process.exit(res.statusCode === 200 ? 0 : 1))''',
-        ]
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:${PORT}/api/health']
       interval: 10s
       timeout: 5s
       retries: 5
