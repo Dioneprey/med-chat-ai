@@ -9,17 +9,17 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
 import { ChatFactory } from 'test/factories/make-chat';
 import { MessageFactory } from 'test/factories/make-message';
 import { JwtService } from '@nestjs/jwt';
+import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
+import { randomUUID } from 'crypto';
 
 describe('Fetch chat messages (E2E)', () => {
   let app: INestApplication;
   let userFactory: UserFactory;
-  let companyFactory: CompanyFactory;
   let chatFactory: ChatFactory;
   let messageFactory: MessageFactory;
   let jwt: JwtService;
@@ -27,7 +27,7 @@ describe('Fetch chat messages (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [UserFactory, CompanyFactory, ChatFactory, MessageFactory],
+      providers: [UserFactory, ChatFactory, MessageFactory],
     }).compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -39,7 +39,6 @@ describe('Fetch chat messages (E2E)', () => {
     );
 
     userFactory = moduleRef.get(UserFactory);
-    companyFactory = moduleRef.get(CompanyFactory);
     chatFactory = moduleRef.get(ChatFactory);
     messageFactory = moduleRef.get(MessageFactory);
     jwt = moduleRef.get(JwtService);
@@ -53,20 +52,16 @@ describe('Fetch chat messages (E2E)', () => {
   });
 
   test('[GET] /chat/:chatId/message', async () => {
-    const company = await companyFactory.makePrismaCompany({
-      name: 'Company',
-    });
+    const companyId = new UniqueEntityID(randomUUID());
 
     const user = await userFactory.makePrismaUser({
       name: 'John Doe',
-      email: 'john.doe@gmail.com',
-      password: await hash('123456', 8),
-      companyId: company.id,
+      companyId: companyId,
     });
 
     const accessToken = jwt.sign({
       sub: user.id.toString(),
-      companyId: company.id.toString(),
+      companyId: companyId.toString(),
       role: user.role,
     });
 

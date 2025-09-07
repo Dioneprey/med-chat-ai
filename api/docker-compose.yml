@@ -1,23 +1,30 @@
 services:
-  api:
-    container_name: medseniorqa_api
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    environment:
-      - DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_USER}@database:5432/${DATABASE_NAME}
-      - REDIS_HOST=redis
-      - JAEGER_URL=http://jaeger:4318/v1/traces
-    ports:
-      - '3333:3333'
-    depends_on:
-      - database
-    networks:
-      - medseniorqa-network
-  database:
-    container_name: medseniorqa_database
+  # api_medchatai:
+  #   container_name: medchatai_api
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_USER}@database:5432/${DATABASE_NAME}
+  #     - REDIS_HOST=redis
+  #     - KAFKA_URL=kafka:9092
+  #     - JAEGER_URL=http://jaeger:4318/v1/traces
+  #   ports:
+  #     - '3333:3333'
+  #   depends_on:
+  #     - database
+  #   networks:
+  #     - medchatai-network
+  #   healthcheck:
+  #     test: ['CMD', 'wget', '-qO-', 'http://localhost:3333/api/health']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  database_medchatai:
+    container_name: medchatai_database
     env_file:
       - .env
     image: 'postgres:15'
@@ -30,24 +37,13 @@ services:
     volumes:
       - ./postgres:/var/lib/postgresql/data
     networks:
-      - medseniorqa-network
+      - medchatai-network
 
-  pgadmin:
-    container_name: medseniorqa_pgadmin
-    image: dpage/pgadmin4:6.10
-    ports:
-      - 8080:80
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=medseniorqa@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=123456
-    networks:
-      - medseniorqa-network
-
-  redis:
+  redis_medchatai:
     image: redis:8.2.1
     env_file:
       - .env
-    container_name: medseniorqa_redis_server
+    container_name: medchatai_redis_server
     ports:
       - '6379:6379'
     volumes:
@@ -56,11 +52,11 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
-      - medseniorqa-network
+      - medchatai-network
 
-  jaeger:
+  jaeger_medchatai:
     image: jaegertracing/all-in-one:1.73.0
-    container_name: medseniorqa_jaeger
+    container_name: medchatai_jaeger
     ports:
       - '16686:16686' # UI
       - '4317:4317' # OTLP gRPC
@@ -71,8 +67,4 @@ services:
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     networks:
-      - medseniorqa-network
-
-networks:
-  medseniorqa-network:
-    driver: bridge
+      - medchatai-network

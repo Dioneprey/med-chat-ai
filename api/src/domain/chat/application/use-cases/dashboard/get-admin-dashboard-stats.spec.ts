@@ -4,12 +4,11 @@ import { InMemoryChatRepository } from 'test/repositories/in-memory-chat.reposit
 import { makeUser } from 'test/factories/make-user';
 import { Role } from 'src/domain/chat/entities/user';
 import { makeChat } from 'test/factories/make-chat';
-import { makeCompany } from 'test/factories/make-company';
-import { InMemoryCompanyRepository } from 'test/repositories/in-memory-company.repository';
 import { makeMessage } from 'test/factories/make-message';
 import { MessageType } from 'src/domain/chat/entities/message';
+import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
+import { randomUUID } from 'crypto';
 
-let inMemoryCompanyRepository: InMemoryCompanyRepository;
 let inMemoryUserRepository: InMemoryUserRepository;
 let inMemoryChatRepository: InMemoryChatRepository;
 
@@ -17,7 +16,6 @@ let sut: GetAdminDashboardStatsUseCase;
 
 describe('Get admin dashboard stats', () => {
   beforeEach(() => {
-    inMemoryCompanyRepository = new InMemoryCompanyRepository();
     inMemoryUserRepository = new InMemoryUserRepository();
     inMemoryChatRepository = new InMemoryChatRepository();
 
@@ -28,20 +26,17 @@ describe('Get admin dashboard stats', () => {
   });
 
   it('should be able to get admin dashboard stats', async () => {
-    const company = makeCompany();
+    const companyId = new UniqueEntityID(randomUUID());
 
     const adminUser = makeUser({
       role: Role.ADMIN,
-      email: 'admin@email.com',
-      companyId: company.id,
+      companyId: companyId,
     });
     const regularUser = makeUser({
       role: Role.USER,
-      email: 'user@email.com',
-      companyId: company.id,
+      companyId: companyId,
     });
 
-    await inMemoryCompanyRepository.create(company);
     await inMemoryUserRepository.create(adminUser);
     await inMemoryUserRepository.create(regularUser);
 

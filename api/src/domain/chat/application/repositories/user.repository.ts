@@ -3,9 +3,6 @@ import { User, UserKey } from '../../entities/user';
 export interface UserRepositoryFindByUniqueFieldProps {
   key: UserKey;
   value: string;
-  include?: {
-    company?: boolean;
-  };
 }
 
 export interface UserRepositoryCountProps {
@@ -18,7 +15,6 @@ export abstract class UserRepository {
   abstract findByUniqueField({
     key,
     value,
-    include,
   }: UserRepositoryFindByUniqueFieldProps): Promise<User | null>;
 
   abstract count({

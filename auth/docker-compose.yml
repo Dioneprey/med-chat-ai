@@ -1,0 +1,70 @@
+services:
+  # api_auth:
+  #   container_name: auth_api
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_USER}@database:5432/${DATABASE_NAME}
+  #     - REDIS_HOST=redis
+  #     - KAFKA_URL=kafka:9092
+  #     - JAEGER_URL=http://jaeger:4318/v1/traces
+  #   ports:
+  #     - '3334:3333'
+  #   depends_on:
+  #     - database
+  #   networks:
+  #     -  medchatai-network
+  #   healthcheck:
+  #     test: ['CMD', 'wget', '-qO-', 'http://localhost:3333/api/health']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  database_auth:
+    container_name: auth_database
+    env_file:
+      - .env
+    image: 'postgres:15'
+    ports:
+      - '5456:5432'
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks:
+      - medchatai-network
+
+  redis_auth:
+    image: redis:8.2.1
+    env_file:
+      - .env
+    container_name: auth_redis_server
+    ports:
+      - '6380:6379'
+    volumes:
+      - ./redis:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - medchatai-network
+
+  jaeger_auth:
+    image: jaegertracing/all-in-one:1.73.0
+    container_name: auth_jaeger
+    ports:
+      - '16687:16686' # UI
+      - '4319:4317' # OTLP gRPC
+      - '4320:4318' # OTLP HTTP
+      - '14269:14268' # Jaeger ingest
+      - '14251:14250' # Jaeger gRPC
+      - '9412:9411' # Zipkin
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    networks:
+      - medchatai-network

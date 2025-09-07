@@ -1,0 +1,40 @@
+_format_version: "3.0"
+
+services:
+  - name: auth-service
+    host: host.docker.internal
+    port: 3334
+    protocol: http
+    connect_timeout: 60000
+    read_timeout: 60000
+    write_timeout: 60000
+    retries: 5
+    enabled: true
+    routes:
+      - name: auth-service
+        paths:
+          - /auth
+        strip_path: true
+        protocols:
+          - http
+        preserve_host: false
+        path_handling: v0
+
+  - name: qa-service
+    host: host.docker.internal
+    port: 3333
+    protocol: http
+    connect_timeout: 60000
+    read_timeout: 60000
+    write_timeout: 60000
+    retries: 5
+    enabled: true
+    routes:
+      - name: qa-service
+        paths:
+          - /qa
+        strip_path: true
+        protocols:
+          - http
+        preserve_host: false
+        path_handling: v0

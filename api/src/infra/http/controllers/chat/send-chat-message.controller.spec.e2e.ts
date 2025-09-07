@@ -2,29 +2,28 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from 'src/infra/app.module';
-import { hash } from 'bcryptjs';
 import { DatabaseModule } from 'src/infra/database/database.module';
 import { UserFactory } from 'test/factories/make-user';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
 import { JwtService } from '@nestjs/jwt';
+import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
+import { randomUUID } from 'crypto';
 
 describe('Send chat message (E2E)', () => {
   let app: INestApplication;
   let userFactory: UserFactory;
-  let companyFactory: CompanyFactory;
 
   let jwt: JwtService;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [UserFactory, CompanyFactory],
+      providers: [UserFactory],
     }).compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -36,7 +35,6 @@ describe('Send chat message (E2E)', () => {
     );
 
     userFactory = moduleRef.get(UserFactory);
-    companyFactory = moduleRef.get(CompanyFactory);
     jwt = moduleRef.get(JwtService);
 
     await app.init();
@@ -48,20 +46,16 @@ describe('Send chat message (E2E)', () => {
   });
 
   test('[POST] /chat/message', async () => {
-    const company = await companyFactory.makePrismaCompany({
-      name: 'Company',
-    });
+    const companyId = new UniqueEntityID(randomUUID());
 
     const user = await userFactory.makePrismaUser({
       name: 'John Doe',
-      email: 'john.doe@gmail.com',
-      password: await hash('123456', 8),
-      companyId: company.id,
+      companyId: companyId,
     });
 
     const accessToken = jwt.sign({
       sub: user.id.toString(),
-      companyId: company.id.toString(),
+      companyId: companyId.toString(),
       role: user.role,
     });
 

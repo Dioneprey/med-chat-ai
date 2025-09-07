@@ -12,8 +12,6 @@ export function makeUser(
   const user = User.create(
     {
       name: faker.person.fullName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
       companyId: override.companyId || new UniqueEntityID(),
       role: override.role ? Role[override.role] : Role.USER,
       ...override,

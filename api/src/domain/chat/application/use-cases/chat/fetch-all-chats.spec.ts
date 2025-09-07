@@ -19,9 +19,7 @@ describe('Fetch all chats', () => {
   });
 
   it('should be able to fetch user chats', async () => {
-    const user = makeUser({
-      email: 'john.doe@email.com',
-    });
+    const user = makeUser({});
 
     inMemoryUserRepository.create(user);
 
@@ -55,9 +53,7 @@ describe('Fetch all chats', () => {
   });
 
   it('should be able to fetch paginated chats', async () => {
-    const user = makeUser({
-      email: 'john.doe@email.com',
-    });
+    const user = makeUser({});
 
     inMemoryUserRepository.create(user);
 
@@ -85,8 +81,8 @@ describe('Fetch all chats', () => {
   });
 
   it('should not be able to access a chat of another user/company', async () => {
-    const user1 = makeUser({ email: 'user1@email.com' });
-    const user2 = makeUser({ email: 'user2@email.com' });
+    const user1 = makeUser();
+    const user2 = makeUser();
 
     const chat = makeChat({
       companyId: user1.companyId,

@@ -23,9 +23,7 @@ describe('Send chat message', () => {
   });
 
   it('should be able to send a question and get a anwser', async () => {
-    const user = makeUser({
-      email: 'john.doe@email.com',
-    });
+    const user = makeUser({});
 
     inMemoryUserRepository.create(user);
 

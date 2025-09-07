@@ -7,10 +7,8 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
-import { JwtService } from '@nestjs/jwt';
 
 describe('Health (E2E)', () => {
   let app: INestApplication;

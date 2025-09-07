@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "./generated/prisma_client"
+  provider      = "prisma-client-js"
+  output        = "./generated/prisma_client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -24,38 +25,15 @@ enum Role {
   ADMIN
 }
 
-enum CodeType {
-  REFRESH_TOKEN
-}
-
-model Company {
-  id        String    @id @default(uuid(7))
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  users       User[]
-  chats       Chat[]
-  invitations Invitation[]
-
-  @@index([name])
-}
-
 model User {
-  id        String    @id @default(uuid(7))
-  email     String
+  id        String    @id
   name      String
-  password  String
   companyId String
-  role      Role      @default(USER)
+  role      Role
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id])
-  chats   Chat[]
-  codes   Code[]
-
-  @@index([email])
+  @@index([companyId])
 }
 
 model Chat {
@@ -66,8 +44,6 @@ model Chat {
   updatedAt DateTime? @updatedAt
 
   messages Message[]
-  user     User      @relation(fields: [userId], references: [id])
-  company  Company   @relation(fields: [companyId], references: [id])
 
   @@index([userId, companyId])
 }
@@ -82,32 +58,4 @@ model Message {
   chat Chat @relation(fields: [chatId], references: [id])
 
   @@index([chatId])
-}
-
-model Invitation {
-  id           String   @id @default(uuid(7))
-  companyId    String
-  invitedEmail String
-  code         String   @unique
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-
-  company Company @relation(fields: [companyId], references: [id])
-
-  @@index([invitedEmail, companyId])
-}
-
-model Code {
-  id        String   @id @default(uuid(7))
-  type      CodeType
-  value     String
-  expiresAt DateTime
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  @@index([userId, type, value])
 }

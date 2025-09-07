@@ -21,9 +21,7 @@ describe('Fetch chat messages', () => {
   });
 
   it('should be able to fetch chat messages', async () => {
-    const user = makeUser({
-      email: 'john.doe@email.com',
-    });
+    const user = makeUser({});
 
     const chat = makeChat({
       companyId: user.companyId,
@@ -67,9 +65,7 @@ describe('Fetch chat messages', () => {
   });
 
   it('should be able to fetch paginated messages', async () => {
-    const user = makeUser({
-      email: 'john.doe@email.com',
-    });
+    const user = makeUser({});
 
     const chat = makeChat({
       companyId: user.companyId,
@@ -104,8 +100,8 @@ describe('Fetch chat messages', () => {
   });
 
   it('should not be able to access a chat messages of another user/company', async () => {
-    const user1 = makeUser({ email: 'user1@email.com' });
-    const user2 = makeUser({ email: 'user2@email.com' });
+    const user1 = makeUser();
+    const user2 = makeUser();
 
     const chat = makeChat({
       companyId: user1.companyId,
