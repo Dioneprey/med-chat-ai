@@ -9,7 +9,6 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { CompanyFactory } from 'test/factories/make-company';
 import { setupFastifyTestApp } from 'test/setup-fastify-e2e';
 import { RawServerDefault } from 'fastify';
 import { ChatFactory } from 'test/factories/make-chat';
@@ -17,11 +16,12 @@ import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/domain/chat/entities/user';
 import { MessageFactory } from 'test/factories/make-message';
 import { MessageType } from 'src/domain/chat/entities/message';
+import { randomUUID } from 'crypto';
+import { UniqueEntityID } from 'src/core/entities/unique-entity-id';
 
 describe('Get admin dashboard stats (E2E)', () => {
   let app: INestApplication;
   let userFactory: UserFactory;
-  let companyFactory: CompanyFactory;
   let chatFactory: ChatFactory;
   let messageFactory: MessageFactory;
   let jwt: JwtService;
@@ -29,7 +29,7 @@ describe('Get admin dashboard stats (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [UserFactory, CompanyFactory, ChatFactory, MessageFactory],
+      providers: [UserFactory, ChatFactory, MessageFactory],
     }).compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -41,7 +41,6 @@ describe('Get admin dashboard stats (E2E)', () => {
     );
 
     userFactory = moduleRef.get(UserFactory);
-    companyFactory = moduleRef.get(CompanyFactory);
     chatFactory = moduleRef.get(ChatFactory);
     messageFactory = moduleRef.get(MessageFactory);
     jwt = moduleRef.get(JwtService);
@@ -50,43 +49,34 @@ describe('Get admin dashboard stats (E2E)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
-  afterAll(async () => {
-    await app.close();
-  });
-
   test('[GET] /dashboard', async () => {
-    const company = await companyFactory.makePrismaCompany({
-      name: 'Company',
-    });
+    const companyId = new UniqueEntityID(randomUUID());
 
     const user = await userFactory.makePrismaUser({
       name: 'John Doe',
-      email: 'john.doe@gmail.com',
-      password: await hash('123456', 8),
       role: Role.ADMIN,
-      companyId: company.id,
+      companyId: companyId,
     });
 
     const regularUser = await userFactory.makePrismaUser({
       role: Role.USER,
-      email: 'user@email.com',
-      companyId: company.id,
+      companyId: companyId,
     });
 
     const accessToken = jwt.sign({
       sub: user.id.toString(),
-      companyId: company.id.toString(),
+      companyId: companyId.toString(),
       role: user.role,
     });
 
     const [chat1, chat2] = await Promise.all([
       chatFactory.makePrismaChat({
         userId: user.id,
-        companyId: company.id,
+        companyId: companyId,
       }),
       chatFactory.makePrismaChat({
         userId: regularUser.id,
-        companyId: company.id,
+        companyId: companyId,
       }),
     ]);
 

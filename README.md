@@ -62,14 +62,17 @@ cd med-chat-api
 cp .env.example .env
 # Edite o arquivo .env conforme necessário
 
+# Instalar pnpm ( se não tiver )
+npm install pnpm -g
+
 # Instalar dependências
 pnpm install
 
 # Rodar os containers necessários (Postgres, Redis, etc)
 docker compose up database redis jaeger -d
 
-# Aplicar as migrations do prisma
-pnpm prisma migrate deploy
+# Aplicar as migrations e generate do prisma
+pnpm run db:deploy
 
 # Rodar a aplicação em modo desenvolvimento
 pnpm run start:dev

@@ -7,10 +7,8 @@ import {
 import { PrismaService } from '../prisma.service';
 import { RedisRepository } from '../../redis/redis.service';
 import { User, UserKey } from 'src/domain/chat/entities/user';
-import {
-  PrismaUserMapper,
-  UserWithInclude,
-} from '../mappers/prisma-user-mapper';
+import { PrismaUserMapper } from '../mappers/prisma-user-mapper';
+import { User as PrismaUser } from '@generated/index';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
@@ -21,28 +19,17 @@ export class PrismaUserRepository implements UserRepository {
   async findByUniqueField({
     key,
     value,
-    include,
   }: UserRepositoryFindByUniqueFieldProps) {
     const cacheKey = `user:${key}:${value}`;
-    const cached = await this.redisRepository.get<UserWithInclude>(cacheKey);
+    const cached = await this.redisRepository.get<PrismaUser>(cacheKey);
 
     if (cached) {
-      if (include?.company) {
-        if (!cached.company) {
-          for (const key of Object.keys(cached) as UserKey[]) {
-            await this.redisRepository.del(`user:${key}:${cached[key]}`);
-          }
-        }
-        return PrismaUserMapper.toDomain(cached);
-      }
+      return PrismaUserMapper.toDomain(cached);
     }
 
     const prismaUser = await this.prisma.user.findFirst({
       where: {
         [key]: value,
-      },
-      include: {
-        company: include?.company,
       },
     });
 
