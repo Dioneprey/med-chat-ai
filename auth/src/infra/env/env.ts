@@ -9,7 +9,7 @@ export const envSchema = z.object({
   DATABASE_USER: z.string().default('postgres'),
   DATABASE_PASSWORD: z.string().default('postgres'),
   DATABASE_NAME: z.string().default('postgres'),
-  DATABASE_PORT: z.string().default('postgres'),
+  DATABASE_PORT: z.number().default(5456),
   COOKIE_SECRET: z.string().default('supersecretmedchat'),
   JWT_SECRET: z.string().default('supersecretmedchat'),
   SECURE_COOKIE: z

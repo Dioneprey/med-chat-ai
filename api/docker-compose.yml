@@ -13,7 +13,7 @@ services:
       - JAEGER_URL=http://jaeger:4318/v1/traces
       - KONG_URL=http://kong:8000
     ports:
-      - '3333:3333'
+      - '${PORT}:3333'
     depends_on:
       - database
     networks:
@@ -31,7 +31,7 @@ services:
       - .env
     image: 'postgres:15'
     ports:
-      - '5455:5432'
+      - '${DATABASE_PORT}:5432'
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -47,7 +47,7 @@ services:
       - .env
     container_name: medchatai_redis_server
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:6379'
     volumes:
       - ./redis:/data
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
