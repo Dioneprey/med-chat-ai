@@ -56,7 +56,7 @@ Principais funcionalidades:
 # Clonar o repositório
 git clone https://github.com/Dioneprey/med-chat-ai.git
 # Entrar na pasta do repositório
-cd medchat-api
+cd med-chat-api
 
 # Copiar variáveis de ambiente
 cp .env.example .env
