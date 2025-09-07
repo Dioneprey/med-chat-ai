@@ -74,6 +74,7 @@ jobs:
       REDIS_HOST: localhost
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ""
+      KAFKA_URL: "localhost:9092"
 
     steps:
       - uses: actions/checkout@v5
@@ -94,7 +95,7 @@ jobs:
       - run: pnpm run test:e2e
         working-directory: ./api
         env:
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/postgres?schema=public"
+          DATABASE_URL: "postgresql://docker:docker@localhost:5432/qa?schema=public"
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v2
         with:
@@ -113,4 +114,4 @@ jobs:
       - run: pnpm run test:e2e
         working-directory: ./auth
         env:
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/postgres?schema=public"
+          DATABASE_URL: "postgresql://docker:docker@localhost:5432/auth?schema=public"
