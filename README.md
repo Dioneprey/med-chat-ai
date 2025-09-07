@@ -51,7 +51,7 @@ Principais funcionalidades:
 ---
 
 ## Instalação e execução
-
+> ⚠️ Observação: Para o chat funcionar, é necessário preencher a variável de ambiente `OPENAI_API_KEY` no arquivo `/api/.env`.
 ## Opção 1: Rodar tudo via Docker
 
 ```bash
