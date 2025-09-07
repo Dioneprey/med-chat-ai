@@ -41,6 +41,10 @@ describe('Send chat message (E2E)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   test('[POST] /chat/message', async () => {
     const companyId = new UniqueEntityID(randomUUID());
 

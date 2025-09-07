@@ -49,6 +49,10 @@ describe('Get admin dashboard stats (E2E)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   test('[GET] /dashboard', async () => {
     const companyId = new UniqueEntityID(randomUUID());
 

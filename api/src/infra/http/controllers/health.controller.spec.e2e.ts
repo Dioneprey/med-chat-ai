@@ -31,6 +31,10 @@ describe('Health (E2E)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   test('[GET] /health', async () => {
     const response = await request(app.getHttpServer()).get('/health').send();
 

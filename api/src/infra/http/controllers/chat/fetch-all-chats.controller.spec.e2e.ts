@@ -44,6 +44,10 @@ describe('Fetch all chats (E2E)', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   test('[GET] /chat', async () => {
     const companyId = new UniqueEntityID(randomUUID());
 
