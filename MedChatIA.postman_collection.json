@@ -1,0 +1,421 @@
+{
+	"info": {
+		"_postman_id": "49346b08-3579-4180-b60a-bde25dcc7d3d",
+		"name": "MedChatIA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25216756",
+		"_collection_link": "https://interstellar-water-11446.postman.co/workspace/Personal~339db449-e09b-4091-818d-b65e80468384/collection/25216756-49346b08-3579-4180-b60a-bde25dcc7d3d?action=share&source=collection_link&creator=25216756"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL_AUTH}}/me",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"medchat.user@gmail.com\",\r\n    \"password\": \"123456\",\r\n    \"invitationCode\": \"ug2kcH\",\r\n    \"name\": \"John Doe testes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_AUTH}}/user",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Company",
+			"item": [
+				{
+					"name": "Get company by name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL_AUTH}}/company?name=Sim Company",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"company"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Sim Company"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invitation",
+			"item": [
+				{
+					"name": "Register invitation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"medchat.user@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_AUTH}}/invitation",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"invitation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke invitation",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"johndoe@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_AUTH}}/invitation",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"invitation"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Authenticate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"medchat.admin@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_AUTH}}/auth",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"medchat.user@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_AUTH}}/auth/refresh",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "Send chat message",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // \"chatId\": \"bc17a992-6a6f-4b07-9084-1d003129e3c6\",\r\n    \"message\": \"Olá, quanto é 4 + 5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_QA}}/chat/message",
+							"host": [
+								"{{URL_QA}}"
+							],
+							"path": [
+								"chat",
+								"message"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch chat messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL_QA}}/chat/b9a28df3-5663-4ac4-9610-3ae5b99bde95/message?pageIndex=1",
+							"host": [
+								"{{URL_QA}}"
+							],
+							"path": [
+								"chat",
+								"b9a28df3-5663-4ac4-9610-3ae5b99bde95",
+								"message"
+							],
+							"query": [
+								{
+									"key": "pageIndex",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch all chats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL_QA}}/chat",
+							"host": [
+								"{{URL_QA}}"
+							],
+							"path": [
+								"chat"
+							],
+							"query": [
+								{
+									"key": "pageIndex",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get admin dashboard stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL_QA}}/dashboard?from=2025-09-07&to=2025-09-20",
+							"host": [
+								"{{URL_QA}}"
+							],
+							"path": [
+								"dashboard"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2025-09-07"
+								},
+								{
+									"key": "to",
+									"value": "2025-09-20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant",
+			"item": [
+				{
+					"name": "Register User Tenant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"medchat.admin@gmail.com\",\r\n    \"password\": \"123456\",\r\n    \"companyName\": \"Sim Company\",\r\n    \"name\": \"John Doe\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL_AUTH}}/user/tenant",
+							"host": [
+								"{{URL_AUTH}}"
+							],
+							"path": [
+								"user",
+								"tenant"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Auth",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL_AUTH}}/health",
+					"host": [
+						"{{URL_AUTH}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Health QA",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL_QA}}/health",
+					"host": [
+						"{{URL_QA}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL_QA",
+			"value": "http://31.97.249.18:7779/qa/api"
+		},
+		{
+			"key": "URL_AUTH",
+			"value": "http://31.97.249.18:7779/auth/api"
+		},
+		{
+			"key": "URL_QA_DEV",
+			"value": "http://localhost:8000/qa/api"
+		},
+		{
+			"key": "URL_AUTH_DEV",
+			"value": "http://localhost:8000/auth/api"
+		}
+	]
+}
