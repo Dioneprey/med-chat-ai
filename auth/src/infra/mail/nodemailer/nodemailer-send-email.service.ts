@@ -23,14 +23,16 @@ export class NodeMailerSendEmailService implements SendEmail {
     variables,
   }: SendEmailParams) {
     if (this.envService.get('NODE_ENV') !== 'production') {
-      return console.log({
-        recipientEmail: recipientEmail,
-        subject: subject,
-        message: Object.entries(variables)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join(', '),
-      });
+      return;
     }
+
+    console.log({
+      recipientEmail: recipientEmail,
+      subject: subject,
+      message: Object.entries(variables)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', '),
+    });
 
     let html: string;
 
