@@ -29,24 +29,21 @@ Principais funcionalidades:
 
 ## 📌 Tecnologias utilizadas
 
-- **Nest.js**
-- **Clean Architecture**
-- **DDD** (Domain-driven design)
+- **Nest.js**  
+- **Clean Architecture & DDD (Domain-Driven Design)** – Organização do código por domínios e responsabilidades.  
 - **Princípios SOLID**
-- **Redis** (Cache-aside e filas)
-- **BullMQ**
-- **Prisma ORM**
+- **Redis** – Implementado para cache-aside e filas de processamento assíncrono.  
+- **BullMQ** – Gestão de filas para tarefas assíncronas, como envio de e-mail.  
+- **Kafka** – Comunicação assíncrona entre microserviços, usado para sincronizar informações de usuários entre os serviços.  
+- **Prisma ORM**.  
 - **PostgreSQL**
-- **Testes unitários**
-- **Docker**
-- **OpenTelemetry (OTel) com Jaeger**
-- **Sentry**
-- **Kafka**
-- **Kong ( API Gateway )**
-- **GitHub Actions**
-  - Testes unitários (em todo **push**)
-  - Testes E2E (em **pull requests**)
-- **Deploy automático com Coolify** (CD / Implantação Contínua)
+- **Testes unitários e E2E** – Cobertura de testes em push e pull requests, garantindo qualidade do código.  
+- **Docker**.  
+- **OpenTelemetry (OTel) com Jaeger**.  
+- **Sentry** 
+- **Kong (API Gateway)** – Gestão e roteamento de APIs.  
+- **GitHub Actions** – CI/CD, incluindo execução de testes automatizados.  
+- **Deploy automático com Coolify** – Implantação contínua para ambientes de produção e homologação.
 
 ---
 
@@ -86,14 +83,16 @@ npm install -g pnpm
 
 # 4️⃣ Subir serviços principais em modo desenvolvimento
 docker compose up --build -d
-## 🔹 Serviço de autenticação (Auth) - Terminal 1
+# 🔹 Serviço de autenticação (Auth) - Terminal 1
+# med-chat-ai/auth
 cd auth
 pnpm install           # Instalar dependências
 pnpm run db:deploy     # Aplicar migrations e gerar Prisma Client
 pnpm run start:dev     # Rodar a API
 
-## 🔹 Serviço de perguntas e respostas (QA) - Terminal 2
-cd ../api
+# 🔹 Serviço de perguntas e respostas (QA) - Terminal 2
+# med-chat-ai/api
+cd api
 pnpm install           # Instalar dependências
 pnpm run db:deploy     # Aplicar migrations e gerar Prisma Client
 pnpm run start:dev     # Rodar a API
@@ -118,7 +117,7 @@ pnpm run start:dev     # Rodar a API
 ## 🔍 Observabilidade
 
 - **Jaeger (Tracing):** [http://localhost:16686](http://localhost:16686)
-- **Bull Board (Filas Auth):** [http://localhost:8000/auth/api/queues](http://localhost:8000/auth/api/queues)
+- **Bull Board (Filas Auth):** [http://localhost:3334/api/queues](http://localhost:3334/api/queues)
 
 ## 🔄 Fluxo de uso da API
 
