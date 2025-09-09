@@ -13,6 +13,9 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
     networks:
       - medchatai-network
   kafka:
@@ -37,6 +40,8 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       CONFLUENT_METRICS_ENABLE: "false"
       CONFLUENT_SUPPORT_CUSTOMER_ID: "anonymous"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
     networks:
       - medchatai-network
   control-center:
@@ -70,6 +75,11 @@ services:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     networks:
       - medchatai-network
+
+volumes:
+  zookeeper-log:
+  zookeeper-data:
+  kafka-data:
 
 networks:
   medchatai-network:
